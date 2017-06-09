@@ -63,9 +63,11 @@ public:
 	static std::pair<IBattleshipGameAlgo*, HINSTANCE> loadAlgo(const string& path, const string& fileName);
 	
 	//Check if the board is valid. if yes returns true, Otherwise returns false and prints to console the relevant mistakes
-	static bool checkBoard(char** board, int* mistakes);
-	static bool checkShape(char** board, char** markedBoard, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
+	static bool checkBoard(const char*** board, int rows, int cols, int depth, int* mistakes);
+	static bool checkShape(char** board, char** markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
 	static bool checkBound(char** board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj);
+	static void checkBoardCut(char** board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);
+	static char** getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth);
 
 	//Prints the board to console (for debug purposes)
 	static void printBoard(char** board);
