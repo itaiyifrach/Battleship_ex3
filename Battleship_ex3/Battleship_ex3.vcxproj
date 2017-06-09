@@ -48,7 +48,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -110,9 +110,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\IBattleshipGameAlgo.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\boards\3d_board_10x10x1_0.sboard" />
     <None Include="..\boards\3d_board_10x10x1_1.sboard" />
     <None Include="..\boards\3d_board_10x10x6_0.sboard" />
@@ -122,6 +119,14 @@
     <None Include="..\boards\bad_board_1.sboard" />
     <None Include="..\boards\bad_board_4.sboard" />
     <None Include="..\boards\good_board.sboard" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameUtils.h" />
+    <ClInclude Include="IBattleshipGameAlgo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GameUtils.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
