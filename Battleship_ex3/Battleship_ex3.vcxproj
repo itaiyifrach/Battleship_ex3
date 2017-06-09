@@ -110,6 +110,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\IBattleshipGameAlgo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\boards\3d_board_10x10x1_0.sboard" />
+    <None Include="..\boards\3d_board_10x10x1_1.sboard" />
+    <None Include="..\boards\3d_board_10x10x6_0.sboard" />
+    <None Include="..\boards\3d_board_10x10x6_1.sboard" />
+    <None Include="..\boards\3d_board_15x15x15_0.sboard" />
+    <None Include="..\boards\3d_board_15x15x15_1.sboard" />
+    <None Include="..\boards\bad_board_1.sboard" />
+    <None Include="..\boards\bad_board_4.sboard" />
+    <None Include="..\boards\good_board.sboard" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

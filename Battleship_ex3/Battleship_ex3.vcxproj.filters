@@ -13,5 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="boards">
+      <UniqueIdentifier>{49e3c8b4-18a8-40a0-8d58-d927026aea94}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\IBattleshipGameAlgo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\boards\3d_board_10x10x1_0.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\3d_board_10x10x1_1.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\3d_board_10x10x6_0.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\3d_board_10x10x6_1.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\3d_board_15x15x15_0.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\3d_board_15x15x15_1.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\bad_board_1.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\bad_board_4.sboard">
+      <Filter>boards</Filter>
+    </None>
+    <None Include="..\boards\good_board.sboard">
+      <Filter>boards</Filter>
+    </None>
   </ItemGroup>
 </Project>
