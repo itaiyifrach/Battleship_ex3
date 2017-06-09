@@ -1,4 +1,5 @@
 #include "GameUtils.h"
+#include <memory>
 
 int GameUtils::initialize(int argc, char** argv, char** board, int numRows, int numCols, string& basePath, bool* useAnimation, int* delay) {
 	string boardPath;	
@@ -38,9 +39,12 @@ int GameUtils::initialize(int argc, char** argv, char** board, int numRows, int 
 		return check;
 	}
 
-	// \n and \r\n compatible.
-	// read getline(inf) X 10, getc from line X 10. empty line / invalid char is a space.
-	parseBoard(boardPath, board, numRows, numCols);
+	// parsing the board to 3D char array
+	char*** board = parseBoard(boardPath);
+	if (board == NULL)	// parsing failed
+	{
+		return -1;
+	}
 
 	// check if the board is valid
 	int mistakes[7] = { 0 };
@@ -186,10 +190,11 @@ char*** GameUtils::parseBoard(const string& boardPath)
 	// memory allocation of the board
 	char*** board = allocateBoard(x, y, z);
 	// skipping next line
+	// possible bonus here
 	getline(ifs, line);
 	
 
-	for (auto i = 0; i < z; i++)
+	for (int i = 0; i < z; i++)
 	{
 		for (int j = 0; i < y; j++)
 		{
@@ -213,16 +218,15 @@ char*** GameUtils::parseBoard(const string& boardPath)
 
 
 
-/*	mistakes:
-*	[0] = Wrong size or shape for ship <char> for player A
-*	[1] = Wrong size or shape for ship <char> for player B
-*	[2] = Too many ships for player A
-*	[3] = Too few ships for player A
-*	[4] = Too many ships for player B
-*	[5] = Too few ships for player B
-*	[6] = Adjacent Ships on Board
-*
-*/
+/*	
+ *	mistakes:
+ *	[0] = Wrong size or shape for ship <char> for player A
+ *	[1] = Wrong size or shape for ship <char> for player B
+ *	[2] = Adjacent Ships on Board
+ *	[3] = The players don't have the same number of ships
+ *	[4] = The players don't have the same types of ships
+ *
+ */
 bool GameUtils::checkBoard(char** board, int* mistakes)
 {
 	char** markedBoard = new char*[rows];
@@ -235,7 +239,9 @@ bool GameUtils::checkBoard(char** board, int* mistakes)
 
 	bool isValid = true, validShape;
 	int validShipsA = 0, validShipsB = 0; // counter for players A/B valid ships found on board
-	int currPlayer;
+	int currPlayer, shipSize;
+	unique_ptr<int[]> shipsTypeA = make_unique<int[]>(4);
+	unique_ptr<int[]> shipsTypeB = make_unique<int[]>(4);
 
 	// scanning the board
 	for (int i = 0; i < rows; i++)
@@ -249,35 +255,43 @@ bool GameUtils::checkBoard(char** board, int* mistakes)
 			case 'B':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_B, mistakes, 0);
 				currPlayer = 0;
+				shipSize = SIZE_SHIP_B;
 				break;
 			case 'P':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_P, mistakes, 0);
 				currPlayer = 0;
+				shipSize = SIZE_SHIP_P;
 				break;
 			case 'M':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_M, mistakes, 0);
 				currPlayer = 0;
+				shipSize = SIZE_SHIP_M;
 				break;
 			case 'D':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_D, mistakes, 0);
 				currPlayer = 0;
+				shipSize = SIZE_SHIP_D;
 				break;
 				// player B options:
 			case 'b':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_B, mistakes, 1);
 				currPlayer = 1;
+				shipSize = SIZE_SHIP_B;
 				break;
 			case 'p':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_P, mistakes, 1);
 				currPlayer = 1;
+				shipSize = SIZE_SHIP_P;
 				break;
 			case 'm':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_M, mistakes, 1);
 				currPlayer = 1;
+				shipSize = SIZE_SHIP_M;
 				break;
 			case 'd':
 				validShape = checkShape(board, markedBoard, i, j, currCharChecked, SIZE_SHIP_D, mistakes, 1);
 				currPlayer = 1;
+				shipSize = SIZE_SHIP_D;
 				break;
 			default:
 				continue;
@@ -286,26 +300,32 @@ bool GameUtils::checkBoard(char** board, int* mistakes)
 			if (validShape == true)
 			{
 				if (currPlayer == 0)
+				{
 					validShipsA++;
+					shipsTypeA[shipSize - 1]++;
+				}
 				else
+				{
 					validShipsB++;
+					shipsTypeB[shipSize - 1]++;
+				}
 			}
 		}
 	}
 	// finish scanning the board
 
 	// checking number of valid ships of players A and B:
-	if (validShipsA > SHIPS_NUM)
-		mistakes[2] = 1;
-	else if (validShipsA < SHIPS_NUM)
+	if (validShipsA != validShipsB)
 		mistakes[3] = 1;
-	if (validShipsB > SHIPS_NUM)
+	// checking if players A and B have the same ships types:
+	if (shipsTypeA[0]!=shipsTypeB[0] || shipsTypeA[1]!=shipsTypeB[1] && shipsTypeA[2]!=shipsTypeB[2]
+		&& shipsTypeA[3]!=shipsTypeB[3])
+	{
 		mistakes[4] = 1;
-	else if (validShipsB < SHIPS_NUM)
-		mistakes[5] = 1;
+	}
 
 	// checking if there were any mistakes
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 5; i++)
 		if (mistakes[i] != 0)
 			isValid = false;
 	for (int i = 0; i < rows; i++)
@@ -384,7 +404,7 @@ bool GameUtils::checkShape(char** board, char** markedBoard, int posI, int posJ,
 		if (checkValid)
 		{
 			if (possibleAdj == 1)
-				mistakes[6] = 1;
+				mistakes[2] = 1;
 			return true;
 		}
 	}
@@ -446,7 +466,7 @@ bool GameUtils::checkShape(char** board, char** markedBoard, int posI, int posJ,
 		if (checkValid)
 		{
 			if (possibleAdj == 1)
-				mistakes[6] = 1;
+				mistakes[2] = 1;
 			return true;
 		}
 	}
@@ -454,7 +474,7 @@ bool GameUtils::checkShape(char** board, char** markedBoard, int posI, int posJ,
 
 	// shape isn't horizental or vertical
 	if (possibleAdj == 1)
-		mistakes[6] = 1;
+		mistakes[2] = 1;
 	if (player == 0)	// player A
 	{
 		if (mistakes[0] == 0)

@@ -18,7 +18,6 @@
 #define SIZE_SHIP_P 2
 #define SIZE_SHIP_M 3
 #define SIZE_SHIP_D 4
-#define SHIPS_NUM 5
 #define BOARD_SUFFIX "\\*.sboard"
 #define ATTACK_SUFFIX "\\*.attack"
 #define DLL_SUFFIX "\\*.dll"
@@ -29,11 +28,9 @@
 #define LOAD_DLL_ERR "Cannot load dll: "
 #define BOARD_MISTAKE_0 "Wrong size or shape for ship "
 #define FOR_PLAYER " for player "
-#define BOARD_MISTAKE_2 "Too many ships for player A"
-#define BOARD_MISTAKE_3 "Too few ships for player A"
-#define BOARD_MISTAKE_4 "Too many ships for player B"
-#define BOARD_MISTAKE_5 "Too few ships for player B"
-#define BOARD_MISTAKE_6 "Adjacent Ships on Board"
+#define BOARD_MISTAKE_2 "Adjacent Ships on Board"
+#define BOARD_MISTAKE_3 "The players don't have the same number of ships"
+#define BOARD_MISTAKE_4 "The players don't have the same types of ships"
 
 using namespace std;
 
