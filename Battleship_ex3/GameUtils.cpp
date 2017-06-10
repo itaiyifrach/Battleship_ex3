@@ -329,12 +329,12 @@ bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int row
 		}
 		if (posJ != cols - 1)	//right bound
 		{
-			if (board[posI + 1][posJ + 1] != ' ')
+			if (board[posI][posJ + 1] != ' ')
 				checkValid = false;
 		}
 		if (checkValid) {
 			markedBoard[posI][posJ] = 'X';
-			return true;
+			return false;
 		}
 	}
 	
