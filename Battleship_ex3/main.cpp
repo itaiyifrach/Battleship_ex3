@@ -3,16 +3,17 @@
 int main(int argc, char** argv) 
 {
 	string basePath;
+	char*** mainBoard;
 
-	auto check = GameUtils::initialize(argc, argv, mainBoard, GameUtils::rows, GameUtils::cols, basePath, &useAnimation, &delay);
+	mainBoard = GameUtils::initialize(argc, argv, basePath);
 	//check if path was invalid(error printed inside function)
-	if (check == -2) {
-		for (int i = 0; i < GameUtils::rows; i++)
-			delete mainBoard[i];
-		delete[](mainBoard);
+	if (mainBoard == NULL) {
+		GameUtils::destroyBoard(mainBoard, 10, 10, 6);
 		return -1;
 	}
+	GameUtils::destroyBoard(mainBoard, 10, 10, 6);
 
+	/*
 	//creates a vector of all *.dll files in the given path
 	vector<string> fileNames= GameUtils::getDLLNames(basePath);
 	//check if number of dll's is invalid or there was a problem with the board (errors printed inside functions)
@@ -99,4 +100,5 @@ int main(int argc, char** argv)
 		delete mainBoard[i];
 	delete[]mainBoard;
 	return 0;
+	*/
 }

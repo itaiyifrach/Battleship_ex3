@@ -1,54 +1,33 @@
 #include "GameUtils.h"
 #include <memory>
 
-int GameUtils::initialize(int argc, char** argv, char** board, int numRows, int numCols, string& basePath, bool* useAnimation, int* delay) {
+char*** GameUtils::initialize(int argc, char** argv, string& basePath) {
 	string boardPath;	
 	
 	// setting cwd as default path
 	auto temp = _fullpath(nullptr, "", MAX_PATH);
 	basePath = temp;
 	free(temp);
-	
-	// searching for -quiet -delay flags
-	int i = 1;
-	for (i; i < argc; i++)
-	{
-		if (strcmp(argv[i], "-quiet") == 0)
-		{
-			*useAnimation = false;
-			break;
-		}
-		if (strcmp(argv[i], "-delay") == 0)
-		{
-			*delay = atoi(argv[i + 1]);
-			break;
-		}
-	}
-	// found a flag after argv[1] || didn't find any flag and there is only path in args --> then path is argv[1]
-	if ((i > 1) || (i == argc && argc == 2))
-	{
-		temp = _fullpath(nullptr, argv[1], MAX_PATH);
-		basePath = temp;
-		free(temp);
-	}
 
 	//check if path was invalid
 	auto check = parsePath(basePath, boardPath);
 	if (check < 0)
 	{
-		return check;
+		return NULL;
 	}
 
 	// parsing the board to 3D char array
 	char*** board = parseBoard(boardPath);
 	if (board == NULL)	// parsing failed
 	{
-		return -1;
+		return NULL;
 	}
+
+	printBoard(board, 10, 10, 6);
 
 	// check if the board is valid
 	int mistakes[5] = { 0 };
-	int rows = 10, cols = 10, depth = 6;
+	int rows = 10, cols = 10, depth = 6, i;
 	char shipMistakeTypeA, shipMistakeTypeB;
 	if (checkBoard((const char***)board, rows, cols, depth, mistakes) == false)
 	{
@@ -80,11 +59,11 @@ int GameUtils::initialize(int argc, char** argv, char** board, int numRows, int 
 				}
 			}
 		}
-		return -1;
+		return NULL;
 	}
 
 	//if all is well return 0
-	return 0;
+	return board;
 }
 
 
@@ -189,29 +168,31 @@ char*** GameUtils::parseBoard(const string& boardPath)
 	getline(ifs, line);
 	
 
-	for (int i = 0; i < z; i++)
+	for (int k = 0; k < z; k++)
 	{
-		for (int j = 0; i < y; j++)
+		for (int i = 0; i < x; i++)
 		{
 			getline(ifs, line);
-			for (int k = 0; k < x; k++)
+			cout << "(" << i << ", " << 'j' << ", " << k << ") ";
+			cout << line << endl;
+			for (int j = 0; j < y; j++)
 			{
-				if ((k < (int)line.size()) && (line[k] == 'b' || line[k] == 'B' || line[k] == 'p' || line[k] == 'P' ||
-					line[k] == 'm' || line[k] == 'M' || line[k] == 'd' || line[k] == 'D'))
+				if ((j < (int)line.size()) && (line[j] == 'b' || line[j] == 'B' || line[j] == 'p' || line[j] == 'P' ||
+					line[j] == 'm' || line[j] == 'M' || line[j] == 'd' || line[j] == 'D'))
 				{
-					board[i][j][k] = line[k];
+					board[i][j][k] = line[j];
 				}
 			}
 		}
 		// skipping lines until we find an empty line
-		while (getline(ifs, line));
+		while (getline(ifs, line) && line != "");
 	}
 	ifs.close();
 
 	return board;
 }
 
-char** getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth)
+char** GameUtils::getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth)
 {
 	char** boardCut = new char*[rows];
 	for (int i = 0; i < rows; i++) {
@@ -229,8 +210,8 @@ char** getBoardCut(const char*** board, int rows, int cols, int depth, bool cutB
 			}
 		}
 	}
-		return boardCut;
 	
+	return boardCut;
 }
 
 bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, int* mistakes)
@@ -581,20 +562,25 @@ bool GameUtils::checkBound(char** board, char shipType, int i, int j, int* mista
 	return false;
 }
 
-void GameUtils::printBoard(char** board)
+
+void GameUtils::printBoard(char*** board, int rows, int cols, int depth)
 {
 	cout << "===========SHOWING BOARD===========";
-	for (int i = 0; i < rows; i++)
-	{
-		cout << " " << endl;
-		for (int j = 0; j < cols; j++)
+	cout << endl;
+	for (int k = 0; k < depth; k++) {
+		cout << "DEPTH #" << k << endl;
+		for (int i = 0; i < rows; i++)
 		{
-			cout << board[i][j] << " ";
+			cout << " " << endl;
+			for (int j = 0; j < cols; j++)
+			{
+				cout << board[i][j][k] << " ";
+			}
 		}
+	cout << endl;
 	}
-	cout << " " << endl;
 	cout << "===================================";
-	cout << " " << endl;
+	cout << endl;
 }
 
 vector<string> GameUtils::getDLLNames(string& path)
@@ -632,7 +618,6 @@ vector<string> GameUtils::getDLLNames(string& path)
 
 }
 
-
 std::pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
 {
 	std::pair<IBattleshipGameAlgo*, HINSTANCE> res(nullptr, nullptr);
@@ -662,7 +647,7 @@ std::pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& pa
 
 }
 
-
+/*
 char** GameUtils::initPlayerBoard(char** mainBoard, int playerNum) {
 	char** playerBoard = new char*[rows];
 	for (int i = 0; i < rows; ++i)
@@ -685,7 +670,7 @@ char** GameUtils::initPlayerBoard(char** mainBoard, int playerNum) {
 	}
 	return playerBoard;
 }
-
+*/
 
 bool GameUtils::isVertical(char** board, int rows, int cols, int i, int j) {
 	if (((j == 0) && ((board[i][1] == 32) || (board[i][1] == '%'))) || ((j == (cols - 1)) && ((board[i][cols - 2] == 32) || (board[i][cols - 2] == '%'))))

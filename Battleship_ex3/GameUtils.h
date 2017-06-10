@@ -11,6 +11,7 @@
 #include <tuple>
 #include <windows.h>
 #include "IBattleshipGameAlgo.h"
+#include <memory>
 
 #define PLAYER_A_NUM 0
 #define PLAYER_B_NUM 1
@@ -38,7 +39,7 @@ class GameUtils
 {
 public:
 	//Check if input args are valid. If so parse the board and check its validity.
-	static int initialize(int argc, char** argv, char** board, int numRows, int numCols, string& basePath);
+	static char*** GameUtils::initialize(int argc, char** argv, string& basePath);
 	
 	// Dynamically allocate a 3D array
 	static char*** allocateBoard(int rows, int cols, int depth);
@@ -70,7 +71,7 @@ public:
 	static char** getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth);
 
 	//Prints the board to console (for debug purposes)
-	static void printBoard(char** board);
+	static void printBoard(char*** board, int rows, int cols, int depth);
 	
 	static char** initPlayerBoard(char** mainBoard, int playerNum);
 
