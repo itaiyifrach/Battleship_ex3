@@ -26,10 +26,9 @@ void GameUtils::parseArgs(int argc, char** argv, string& basePath, int& numOfThr
 	}
 }
 
-
-unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::allocateBoard(int rows, int cols, int depth)
+char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 {
-	unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
+	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
 	for (int i = 0; i < rows; i++)
 	{
 		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
@@ -92,7 +91,7 @@ vector<string> GameUtils::split(string str, char delimiter) {
 	return internal;
 }
 
-unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::parseBoard(const string& path, const string& boardName, int& rows, int& cols, int& depth)
+char3DArray GameUtils::parseBoard(const string& path, const string& boardName, int& rows, int& cols, int& depth)
 {
 	string boardPath = path + "\\" + boardName;
 	ifstream ifs(boardPath);
@@ -149,9 +148,9 @@ unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::parseBoard(const strin
 	return board;
 }
 
-unique_ptr<unique_ptr<char[]>[]> GameUtils::getBoardCut(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, bool cutByDepth)
+char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int depth, bool cutByDepth)
 {
-	unique_ptr<unique_ptr<char[]>[]> boardCut = make_unique<unique_ptr<char[]>[]>(rows);
+	char2DArray boardCut = make_unique<unique_ptr<char[]>[]>(rows);
 	for (int i = 0; i < rows; i++) {
 		boardCut[i] = make_unique<char[]>(cols);
 	}
@@ -171,9 +170,9 @@ unique_ptr<unique_ptr<char[]>[]> GameUtils::getBoardCut(unique_ptr<unique_ptr<un
 	return boardCut;
 }
 
-bool GameUtils::checkBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, int* mistakes)
+bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes)
 {
-	unique_ptr<unique_ptr<char[]>[]> boardCut;
+	char2DArray boardCut;
 	bool isValidBoard = true;
 	unique_ptr<int[]> shipsTypeA = make_unique<int[]>(5);
 	unique_ptr<int[]> shipsTypeB = make_unique<int[]>(5);
@@ -222,9 +221,9 @@ bool GameUtils::checkBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board
  *	[3] = The players don't have the same number of ships
  *	[4] = The players don't have the same types of ships
  */
-void GameUtils::checkBoardCut(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
+void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
 {
-	unique_ptr<unique_ptr<char[]>[]> markedBoard = make_unique<unique_ptr<char[]>[]>(rows);
+	char2DArray markedBoard = make_unique<unique_ptr<char[]>[]>(rows);
 	for (int i = 0; i < rows; i++) {
 		markedBoard[i] = make_unique<char[]>(cols);
 	}
@@ -308,7 +307,7 @@ void GameUtils::checkBoardCut(unique_ptr<unique_ptr<char[]>[]>& board, int rows,
 	// finish scanning the board
 }
 
-bool GameUtils::checkShape(unique_ptr<unique_ptr<char[]>[]>& board, unique_ptr<unique_ptr<char[]>[]>& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player)
+bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player)
 {
 	bool checkValid = true;
 	// check if it is a single tile
@@ -488,7 +487,7 @@ bool GameUtils::checkShape(unique_ptr<unique_ptr<char[]>[]>& board, unique_ptr<u
 	return false;
 }
 
-bool GameUtils::checkBound(unique_ptr<unique_ptr<char[]>[]>& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj)
+bool GameUtils::checkBound(char2DArray& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj)
 {
 	char checkChar = board[i][j];
 	if (checkChar != ' ')	// if the tile isn't sea
@@ -517,7 +516,7 @@ bool GameUtils::checkBound(unique_ptr<unique_ptr<char[]>[]>& board, char shipTyp
 }
 
 
-void GameUtils::print3DBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth)
+void GameUtils::print3DBoard(char3DArray& board, int rows, int cols, int depth)
 {
 	cout << "===========SHOWING BOARD===========";
 	cout << endl;
@@ -537,7 +536,7 @@ void GameUtils::print3DBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& boa
 	cout << endl;
 }
 
-void GameUtils::print2DBoard(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols)
+void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
 {
 	cout << "===========SHOWING BOARD===========";
 	for (int i = 0; i < rows; i++)
@@ -553,7 +552,7 @@ void GameUtils::print2DBoard(unique_ptr<unique_ptr<char[]>[]>& board, int rows, 
 	cout << " " << endl;
 }
 
-int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>>& boards)
+int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<char3DArray>& boards)
 {
 	char shipMistakeTypeA, shipMistakeTypeB;
 	int numOfBoards = 0;
@@ -561,7 +560,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<u
 	{
 		// parsing the board to 3D char array	
 		int rows, cols, depth;
-		unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> board = parseBoard(path, boardNames[j], rows, cols, depth);
+		char3DArray board = parseBoard(path, boardNames[j], rows, cols, depth);
 		print3DBoard(board, rows, cols, depth);
 		if (board != nullptr)	// parsing failed
 		{
@@ -569,7 +568,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<u
 			int mistakes[5] = { 0 };			
 			if (checkBoard(board, rows, cols, depth, mistakes) != false)
 			{				
-				boards.push_back(board);
+				boards.push_back(std::move(board));
 				numOfBoards++;				
 			}
 			// TODO: possible bonus here
@@ -674,7 +673,7 @@ int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<p
 		auto player = loadAlgo(path, dllNames[i]);
 		if(player.first!=nullptr)
 		{
-			playersVec.push_back(player);
+			playersVec.push_back(std::move(player));
 			numOfPlayers++;
 		}
 	}

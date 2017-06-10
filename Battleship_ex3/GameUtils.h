@@ -35,6 +35,8 @@
 #define BOARD_MISTAKE_4 "The players don't have the same types of ships"
 
 using namespace std;
+typedef unique_ptr<unique_ptr<char[]>[]> char2DArray;
+typedef unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> char3DArray;
 
 class GameUtils
 {
@@ -43,7 +45,7 @@ public:
 	static void parseArgs(int argc, char** argv, string& basePath, int& numOfThreads);
 
 	// Dynamically allocate a 3D array
-	static unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::allocateBoard(int rows, int cols, int depth);
+	static char3DArray allocateBoard(int rows, int cols, int depth);
 
 	//Dynamically deallocate a 3D array
 	//static void destroyBoard(char*** board, int rows, int cols, int depth);
@@ -51,13 +53,13 @@ public:
 	static vector<string> split(string str, char delimiter);
 
 	//finds all *.sboard files of given path and returns a sorted vector of them
-	static int GameUtils::parsePath(const string& basePath, vector<string>& boardNames);
+	static int parsePath(const string& basePath, vector<string>& boardNames);
 
 	//Loads all legal boards to vector
-	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>>& boards);
+	static int getBoards(const string& path, vector<string>& boardNames, vector<char3DArray>& boards);
 
 	//Parse board from .sboard file
-	static unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);	
+	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
 
 	//finds all *.dll files of given path and returns a sorted vector of them
 	static vector<string> getDLLNames(string& path);	
@@ -66,22 +68,22 @@ public:
 	static pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);	
 
 	//Loads all players to vector
-	static int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
+	static int getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
 
 	//Check if the board is valid
-	static bool GameUtils::checkBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, int* mistakes);
+	static bool checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
 
-	static bool GameUtils::checkShape(unique_ptr<unique_ptr<char[]>[]>& board, unique_ptr<unique_ptr<char[]>[]>& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
+	static bool checkShape(char2DArray& board, char2DArray& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
 
-	static bool GameUtils::checkBound(unique_ptr<unique_ptr<char[]>[]>& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj);
+	static bool checkBound(char2DArray& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj);
 
-	static void GameUtils::checkBoardCut(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);
+	static void checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);
 
-	static unique_ptr<unique_ptr<char[]>[]> GameUtils::getBoardCut(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, bool cutByDepth);
+	static char2DArray getBoardCut(char3DArray& board, int rows, int cols, int depth, bool cutByDepth);
 
 	//Prints the board to console (for debug purposes)
-	static void print3DBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth);
-	static void print2DBoard(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols);
+	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
+	static void print2DBoard(char2DArray& board, int rows, int cols);
 	
 	//static char** initPlayerBoard(char** mainBoard, int playerNum);
 
@@ -94,5 +96,5 @@ public:
 	static bool selfHit(char boardSymbol, int attackPlayer);
 
 	//free all dll libs
-	static void GameUtils::freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
+	static void freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
 };
