@@ -121,12 +121,18 @@
     <None Include="..\boards\good_board.sboard" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BattleshipGame.h" />
+    <ClInclude Include="BattleshipPlayerSmart.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />
+    <ClInclude Include="OurBoardData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BattleshipGame.cpp" />
+    <ClCompile Include="BattleshipPlayerSmart.cpp" />
     <ClCompile Include="GameUtils.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OurBoardData.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,76 +1,34 @@
 #include "GameUtils.h"
 #include <memory>
 
-char*** GameUtils::initialize(int argc, char** argv, string& basePath) {
-	string boardPath;	
-	
+void GameUtils::parseArgs(int argc, char** argv, string& basePath) {
+		
+	//TODO: need to add support for numOfThreads parameter
 	// setting cwd as default path
 	auto temp = _fullpath(nullptr, "", MAX_PATH);
 	basePath = temp;
 	free(temp);
 
-	//check if path was invalid
-	auto check = parsePath(basePath, boardPath);
-	if (check < 0)
-	{
-		return NULL;
-	}
-
-	// parsing the board to 3D char array
-	char*** board = parseBoard(boardPath);
-	if (board == NULL)	// parsing failed
-	{
-		return NULL;
-	}
-
-	printBoard(board, 10, 10, 6);
-
-	// check if the board is valid
-	int mistakes[5] = { 0 };
-	int rows = 10, cols = 10, depth = 6, i;
-	char shipMistakeTypeA, shipMistakeTypeB;
-	if (checkBoard((const char***)board, rows, cols, depth, mistakes) == false)
-	{
-		for (i = 0; i < 5; i++)
-		{
-			if (mistakes[i] != 0)
-			{
-				switch (i)
-				{
-				case 0:
-					shipMistakeTypeA = mistakes[0];
-					cout << BOARD_MISTAKE_0 << shipMistakeTypeA << FOR_PLAYER << "A" << endl;
-					break;
-				case 1:
-					shipMistakeTypeB = mistakes[1];
-					cout << BOARD_MISTAKE_0 << shipMistakeTypeB << FOR_PLAYER << "B" << endl;
-					break;
-				case 2:
-					cout << BOARD_MISTAKE_2 << endl;
-					break;
-				case 3:
-					cout << BOARD_MISTAKE_3 << endl;
-					break;
-				case 4:
-					cout << BOARD_MISTAKE_4 << endl;
-					break;
-				default:
-					break;
-				}
-			}
-		}
-		return NULL;
-	}
-
-	//if all is well return 0
-	return board;
 }
 
 
-// Dynamically allocate a 3D array
-char*** GameUtils::allocateBoard(int rows, int cols, int depth)
+unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::allocateBoard(int rows, int cols, int depth)
 {
-	char*** board = new char**[rows];
+	unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
+	for (int i = 0; i < rows; i++)
+	{
+		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
+		for (int j = 0; j < cols; j++)
+		{
+			board[i][j] = make_unique<char[]>(depth);
+			for(int k=0;k<depth;k++)
+			{
+				board[i][j][k] = ' ';
+			}
+		}
+	}
+	return board;
+	/*char*** board = new char**[rows];
 	for (int i = 0; i < rows; ++i) 
 	{
 		board[i] = new char*[cols];
@@ -80,11 +38,11 @@ char*** GameUtils::allocateBoard(int rows, int cols, int depth)
 			memset(board[i][j], ' ', depth);
 		}
 	}
-	return board;
+	return board;*/
 }
 
-//Dynamically deallocate a 3D array
-void GameUtils::destroyBoard(char*** board, int rows, int cols, int depth)
+
+/*void GameUtils::destroyBoard(char*** board, int rows, int cols, int depth)
 {
 	for (int i = 0; i < rows; i++)
 	{
@@ -93,19 +51,27 @@ void GameUtils::destroyBoard(char*** board, int rows, int cols, int depth)
 		delete[] board[i];
 	}
 	delete[] board;
-}
+}*/
 
-int GameUtils::parsePath(const string& basePath, string& file_path)
+int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
+
 	HANDLE dir;
-	WIN32_FIND_DATAA fileData; //data struct for file
+	WIN32_FIND_DATAA fileData; //data struct for file	
+
+	// iterate over *.sboard files in path	
 	string file_suffix = BOARD_SUFFIX; //only *.sboard files
 	
 	dir = FindFirstFileA((basePath + file_suffix).c_str(), &fileData); // Notice: Unicode compatible version of FindFirstFile
 	if (dir != INVALID_HANDLE_VALUE) //check if the dir opened successfully
 	{
-		string fileName = fileData.cFileName;
-		file_path = basePath + "\\" + fileName;
+		// test each file suffix and set variables as needed
+		do
+		{
+			string fileName = fileData.cFileName;
+			boardNames.push_back(fileName);
+
+		} while (FindNextFileA(dir, &fileData)); // Notice: Unicode compatible version of FindNextFile
 	}
 	else
 	{
@@ -121,8 +87,8 @@ int GameUtils::parsePath(const string& basePath, string& file_path)
 			return -1;
 		}
 	}
-
-	return 0;
+	sort(boardNames.begin(), boardNames.end());
+	return 0;	
 }
 
 vector<string> GameUtils::split(string str, char delimiter) {
@@ -135,19 +101,20 @@ vector<string> GameUtils::split(string str, char delimiter) {
 	return internal;
 }
 
-char*** GameUtils::parseBoard(const string& boardPath)
+unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::parseBoard(const string& path, const string& boardName, int& x, int& y, int& z)
 {
+	string boardPath = path + "\\" + boardName;
 	ifstream ifs(boardPath);
 	string line, token;
 	string delimiter = "x";
-	int x, y, z;
+	
 
 	// getting first line, which includes the dimentions of the board
 	getline(ifs, line);
 	vector<string> tokens = split(line, 'x');
 	if (tokens.size() != 3) {
 		// possible bonus here
-		return NULL;
+		return nullptr;
 	}
 	istringstream firstStream(tokens[0]);
 	istringstream secondStream(tokens[1]);
@@ -158,11 +125,11 @@ char*** GameUtils::parseBoard(const string& boardPath)
 	if (firstStream.fail() || secondStream.fail() || thirdStream.fail() || x<1  || y<1 || z<1)
 	{
 		// possible bonus here
-		return NULL;
-	}
-
+		return nullptr;
+	}	
+	
 	// memory allocation of the board
-	char*** board = allocateBoard(x, y, z);
+	auto board =allocateBoard(x, y, z);
 	// skipping next line
 	// possible bonus here
 	getline(ifs, line);
@@ -177,7 +144,7 @@ char*** GameUtils::parseBoard(const string& boardPath)
 			cout << line << endl;
 			for (int j = 0; j < y; j++)
 			{
-				if ((j < (int)line.size()) && (line[j] == 'b' || line[j] == 'B' || line[j] == 'p' || line[j] == 'P' ||
+				if ((j < int(line.size())) && (line[j] == 'b' || line[j] == 'B' || line[j] == 'p' || line[j] == 'P' ||
 					line[j] == 'm' || line[j] == 'M' || line[j] == 'd' || line[j] == 'D'))
 				{
 					board[i][j][k] = line[j];
@@ -192,11 +159,11 @@ char*** GameUtils::parseBoard(const string& boardPath)
 	return board;
 }
 
-char** GameUtils::getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth)
+unique_ptr<unique_ptr<char[]>[]> GameUtils::getBoardCut(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, bool cutByDepth)
 {
-	char** boardCut = new char*[rows];
+	unique_ptr<unique_ptr<char[]>[]> boardCut =make_unique<unique_ptr<char[]>[]>(rows);
 	for (int i = 0; i < rows; i++) {
-		boardCut[i] = new char[cols];
+		boardCut[i] = make_unique<char[]>(cols);
 	}
 
 	for (int i = 0; i < rows; i++) {
@@ -214,9 +181,9 @@ char** GameUtils::getBoardCut(const char*** board, int rows, int cols, int depth
 	return boardCut;
 }
 
-bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, int* mistakes)
+bool GameUtils::checkBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, int* mistakes)
 {
-	char** boardCut;
+	unique_ptr<unique_ptr<char[]>[]> boardCut;
 	bool isValidBoard = true;
 	unique_ptr<int[]> shipsTypeA = make_unique<int[]>(5);
 	unique_ptr<int[]> shipsTypeB = make_unique<int[]>(5);
@@ -263,11 +230,12 @@ bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, i
  *	[3] = The players don't have the same number of ships
  *	[4] = The players don't have the same types of ships
  */
-void GameUtils::checkBoardCut(char** board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
+void GameUtils::checkBoardCut(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
 {
-	char** markedBoard = new char*[rows];
-	for (int i = 0; i < cols; ++i)
-		markedBoard[i] = new char[cols];
+	unique_ptr<unique_ptr<char[]>[]> markedBoard = make_unique<unique_ptr<char[]>[]>(rows);
+	for (int i = 0; i < rows; i++) {
+		markedBoard[i] = make_unique<char[]>(cols);
+	}
 	// copy board to markedBoard
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
@@ -346,15 +314,15 @@ void GameUtils::checkBoardCut(char** board, int rows, int cols, int* mistakes, u
 		}
 	}	// finish scanning the board
 	
-	for (int i = 0; i < rows; i++) {
+	/*for (int i = 0; i < rows; i++) {
 		delete board[i];
 		delete markedBoard[i];
 	}
 	delete[](board);
-	delete[](markedBoard);
+	delete[](markedBoard);*/
 }
 
-bool GameUtils::checkShape(char** board, char** markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player)
+bool GameUtils::checkShape(unique_ptr<unique_ptr<char[]>[]>& board, unique_ptr<unique_ptr<char[]>[]>& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player)
 {
 	bool checkValid = true;
 	// check if it is a single tile
@@ -534,7 +502,7 @@ bool GameUtils::checkShape(char** board, char** markedBoard, int rows, int cols,
 	return false;
 }
 
-bool GameUtils::checkBound(char** board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj)
+bool GameUtils::checkBound(unique_ptr<unique_ptr<char[]>[]>& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj)
 {
 	char checkChar = board[i][j];
 	if (checkChar != ' ')	// if the tile isn't sea
@@ -583,6 +551,29 @@ void GameUtils::printBoard(char*** board, int rows, int cols, int depth)
 	cout << endl;
 }
 
+int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>>& boards)
+{
+	int numOfBoards = 0;
+	for (int j = 0; j<boardNames.size(); j++)
+	{
+		// parsing the board to 3D char array	
+		int rows, cols, depth;
+		unique_ptr<unique_ptr<unique_ptr<char[]>[]>[] > board = parseBoard(path,boardNames[j],rows,cols,depth);
+		if (board != nullptr)	// parsing failed
+		{
+			// check if the board is valid
+			int mistakes[5] = { 0 };			
+			if (checkBoard(board, rows, cols, depth, mistakes) != false)
+			{				
+				boards.push_back(board);
+				numOfBoards++;				
+			}
+		}
+		//printBoard(board, 10, 10, 6);
+	}
+	return numOfBoards;
+}
+
 vector<string> GameUtils::getDLLNames(string& path)
 {
 	HANDLE dir;
@@ -603,11 +594,6 @@ vector<string> GameUtils::getDLLNames(string& path)
 
 		} while (FindNextFileA(dir, &fileData)); // Notice: Unicode compatible version of FindNextFile
 	}
-	else
-	{
-		cout << MISSING_ALGO << path << endl;
-		return fileNames;
-	}
 	if (fileNames.size()<2)
 	{
 		cout << MISSING_ALGO << path << endl;
@@ -618,9 +604,9 @@ vector<string> GameUtils::getDLLNames(string& path)
 
 }
 
-std::pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
+pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
 {
-	std::pair<IBattleshipGameAlgo*, HINSTANCE> res(nullptr, nullptr);
+	
 	// define function of the type we expect
 	typedef IBattleshipGameAlgo *(*GetAlgoFuncType)();
 	GetAlgoFuncType getAlgoFunc;
@@ -628,25 +614,38 @@ std::pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& pa
 	// Load dynamic library
 	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary
 	if (!hDll)
-	{
-		cout << LOAD_DLL_ERR << algoPath <<endl;
-		return res;
+	{		
+		return make_pair(nullptr, nullptr);
 	}
 	
 	// Get function pointer
-	getAlgoFunc = (GetAlgoFuncType)GetProcAddress(hDll, "GetAlgorithm");
+	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll,"GetAlgorithm"));
 	if (!getAlgoFunc)
 	{
-		FreeLibrary(hDll);
-		cout << LOAD_DLL_ERR << algoPath << endl;
-		return res;
-	}
-	res.first = getAlgoFunc();
-	res.second = hDll;
+		FreeLibrary(hDll);		
+		return make_pair(nullptr, nullptr);
+	}	
+	std::pair< unique_ptr<IBattleshipGameAlgo>, HINSTANCE> res(getAlgoFunc(), hDll);	
 	return res;
 
 }
 
+int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec)
+{
+	int numOfPlayers = 0;
+
+	for(int i=0;i<dllNames.size();i++)
+	{
+		auto player = loadAlgo(path, dllNames[i]);
+		if(player.first!=nullptr)
+		{
+			playersVec.push_back(player);
+			numOfPlayers++;
+		}
+	}
+
+	return numOfPlayers;
+}
 /*
 char** GameUtils::initPlayerBoard(char** mainBoard, int playerNum) {
 	char** playerBoard = new char*[rows];
@@ -724,4 +723,10 @@ bool GameUtils::selfHit(char boardSymbol, int attackPlayer)
 	default:
 		return false;
 	}
+}
+
+void GameUtils::freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec)
+{
+	for (int i = 0; i < playersVec.size(); i++)
+		FreeLibrary(playersVec[i].second);
 }
