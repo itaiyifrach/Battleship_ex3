@@ -23,15 +23,15 @@ char*** GameUtils::initialize(int argc, char** argv, string& basePath) {
 		return NULL;
 	}
 
-	printBoard(board, 10, 10, 6);
+	print3DBoard(board, 10, 10, 6);
 
 	// check if the board is valid
 	int mistakes[5] = { 0 };
-	int rows = 10, cols = 10, depth = 6, i;
+	int rows = 10, cols = 10, depth = 6;
 	char shipMistakeTypeA, shipMistakeTypeB;
 	if (checkBoard((const char***)board, rows, cols, depth, mistakes) == false)
 	{
-		for (i = 0; i < 5; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			if (mistakes[i] != 0)
 			{
@@ -199,7 +199,8 @@ char** GameUtils::getBoardCut(const char*** board, int rows, int cols, int depth
 		boardCut[i] = new char[cols];
 	}
 
-	for (int i = 0; i < rows; i++) {
+	for (int i = 0; i < rows; i++) 
+	{
 		for (int j = 0; j < cols; j++)
 		{
 			if (!cutByDepth) {
@@ -225,6 +226,7 @@ bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, i
 	for (int i = 0; i < depth; i++)
 	{
 		boardCut = getBoardCut(board, rows, cols, i, false);
+		print2DBoard(boardCut, 10, 10);
 		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
 	}
 
@@ -232,7 +234,9 @@ bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, i
 	for (int i = 0; i < cols; i++)
 	{
 		boardCut = getBoardCut(board, rows, depth, i, true);
-		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
+		print2DBoard(boardCut, 10, 6);
+		checkBoardCut(boardCut, rows, depth, mistakes, shipsTypeA, shipsTypeB);
+		cout << i << endl;
 	}
 
 	// checking number of valid ships of players A and B:
@@ -266,12 +270,15 @@ bool GameUtils::checkBoard(const char*** board, int rows, int cols, int depth, i
 void GameUtils::checkBoardCut(char** board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
 {
 	char** markedBoard = new char*[rows];
-	for (int i = 0; i < cols; ++i)
+	for (int i = 0; i < cols; ++i) {
 		markedBoard[i] = new char[cols];
+	}
 	// copy board to markedBoard
-	for (int i = 0; i < rows; i++)
-		for (int j = 0; j < cols; j++)
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
 			markedBoard[i][j] = board[i][j];
+		}
+	}
 
 	bool isValid = true, validShape;
 	int currPlayer, shipSize;
@@ -563,7 +570,7 @@ bool GameUtils::checkBound(char** board, char shipType, int i, int j, int* mista
 }
 
 
-void GameUtils::printBoard(char*** board, int rows, int cols, int depth)
+void GameUtils::print3DBoard(char*** board, int rows, int cols, int depth)
 {
 	cout << "===========SHOWING BOARD===========";
 	cout << endl;
@@ -581,6 +588,22 @@ void GameUtils::printBoard(char*** board, int rows, int cols, int depth)
 	}
 	cout << "===================================";
 	cout << endl;
+}
+
+void GameUtils::print2DBoard(char** board, int rows, int cols)
+{
+	cout << "===========SHOWING BOARD===========";
+	for (int i = 0; i < rows; i++)
+	{
+		cout << " " << endl;
+		for (int j = 0; j < cols; j++)
+		{
+			cout << board[i][j] << " ";
+		}
+	}
+	cout << " " << endl;
+	cout << "===================================";
+	cout << " " << endl;
 }
 
 vector<string> GameUtils::getDLLNames(string& path)

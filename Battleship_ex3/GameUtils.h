@@ -71,7 +71,8 @@ public:
 	static char** getBoardCut(const char*** board, int rows, int cols, int depth, bool cutByDepth);
 
 	//Prints the board to console (for debug purposes)
-	static void printBoard(char*** board, int rows, int cols, int depth);
+	static void print3DBoard(char*** board, int rows, int cols, int depth);
+	static void print2DBoard(char** board, int rows, int cols);
 	
 	static char** initPlayerBoard(char** mainBoard, int playerNum);
 
