@@ -1,4 +1,5 @@
-﻿#include "BattleshipPlayerSmart.h"
+﻿/*
+#include "BattleshipPlayerSmart.h"
 
 
 
@@ -621,3 +622,4 @@ IBattleshipGameAlgo* GetAlgorithm()
 {
 	return new BattleshipPlayerSmart();
 }
+*/

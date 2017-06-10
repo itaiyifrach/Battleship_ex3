@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿/*
+#pragma once
 
 #include <algorithm>
 #include <ctime>
@@ -100,3 +101,4 @@ private:
 	
 	void foundVerticalAttDownTransition(int row, int col, AttackResult result);
 };
+*/

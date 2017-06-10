@@ -1,3 +1,4 @@
+/*
 #include "GameUtils.h"
 #include <windows.h>
 
@@ -82,4 +83,4 @@ private:
 	void updateColorBoard(HANDLE* hConsole, int i, int j, int turnOf, AttackResult attackResult, bool selfHit, int delay) const;
 	static void hideCursor(HANDLE* hConsole);
 };
-
+*/

@@ -1,3 +1,4 @@
+/*
 #include "BattleshipGame.h"
 
 
@@ -414,4 +415,5 @@ void BattleshipGame::hideCursor(HANDLE* hConsole)
 	info.dwSize = 100;
 	info.bVisible = FALSE;
 	SetConsoleCursorInfo(*hConsole, &info);
-}*/
+}
+*/

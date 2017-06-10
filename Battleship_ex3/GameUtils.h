@@ -29,6 +29,10 @@
 #define NOT_ENOUGH_LEGAL "Error: insufficient legal files to start the competition"
 #define LEGAL_PLAYERS "Number of legal players: "
 #define LEGAL_BOARDS "Number of legal boards: "
+#define BOARD_MISTAKE_0 "Wrong size or shape for ship "
+#define BOARD_MISTAKE_2 "Adjacent Ships on Board"
+#define BOARD_MISTAKE_3 "The players don't have the same number of ships"
+#define BOARD_MISTAKE_4 "The players don't have the same types of ships"
 
 using namespace std;
 
@@ -36,7 +40,7 @@ class GameUtils
 {
 public:
 	//Parses input args.
-	static void GameUtils::parseArgs(int argc, char** argv, string& basePath);	
+	static void parseArgs(int argc, char** argv, string& basePath, int& numOfThreads);
 
 	// Dynamically allocate a 3D array
 	static unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> GameUtils::allocateBoard(int rows, int cols, int depth);
@@ -76,8 +80,8 @@ public:
 	static unique_ptr<unique_ptr<char[]>[]> GameUtils::getBoardCut(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth, bool cutByDepth);
 
 	//Prints the board to console (for debug purposes)
-	static void print3DBoard(char*** board, int rows, int cols, int depth);
-	static void print2DBoard(char** board, int rows, int cols);
+	static void print3DBoard(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]>& board, int rows, int cols, int depth);
+	static void print2DBoard(unique_ptr<unique_ptr<char[]>[]>& board, int rows, int cols);
 	
 	//static char** initPlayerBoard(char** mainBoard, int playerNum);
 
