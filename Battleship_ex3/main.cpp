@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	}*/
 	//loads all boards
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
-	cout << "#BOARDS = " << numOfBoards << endl;
+	cout << "# of Valid BOARDS = " << numOfBoards << endl;
 	/*
 	//loads all dll's
 	numOfPlayers = GameUtils::getPlayers(basePath,dllNames,playersVec);

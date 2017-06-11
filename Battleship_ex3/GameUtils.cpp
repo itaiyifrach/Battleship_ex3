@@ -129,8 +129,6 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 		for (int i = 0; i < rows; i++)
 		{
 			getline(ifs, line);
-			cout << "(" << i << ", " << 'j' << ", " << k << ") ";
-			cout << line << endl;
 			for (int j = 0; j < cols; j++)
 			{
 				if ((j < int(line.size())) && (line[j] == 'b' || line[j] == 'B' || line[j] == 'p' || line[j] == 'P' ||
@@ -189,30 +187,30 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 	for (int i = 0; i < depth; i++)
 	{
 		boardCut = getBoardCut(board, rows, cols, i, 2);
-		print2DBoard(boardCut, rows, cols);
+		//print2DBoard(boardCut, rows, cols);
 		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
-		print1DBoard(shipsTypeA, 5);
-		print1DBoard(shipsTypeB, 5);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by COLS
 	for (int i = 0; i < cols; i++)
 	{
 		boardCut = getBoardCut(board, rows, depth, i, 1);
-		print2DBoard(boardCut, rows, depth);
+		//print2DBoard(boardCut, rows, depth);
 		checkBoardCut(boardCut, rows, depth, mistakes, shipsTypeA, shipsTypeB);
-		print1DBoard(shipsTypeA, 5);
-		print1DBoard(shipsTypeB, 5);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by ROWS
 	for (int i = 0; i < rows; i++)
 	{
 		boardCut = getBoardCut(board, depth, cols, i, 0);
-		print2DBoard(boardCut, depth, cols);
+		//print2DBoard(boardCut, depth, cols);
 		checkBoardCut(boardCut, depth, cols, mistakes, shipsTypeA, shipsTypeB);
-		print1DBoard(shipsTypeA, 5);
-		print1DBoard(shipsTypeB, 5);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking number of valid ships of players A and B:
@@ -224,7 +222,6 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 		|| shipsTypeA[4] != shipsTypeB[4]) {
 		mistakes[4] = 1;
 	}
-
 	// checking if there were any mistakes
 	for (int i = 0; i < 5; i++) {
 		if (mistakes[i] != 0) {
@@ -310,7 +307,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			default:
 				continue;
 			}
-			print2DBoard(markedBoard, rows, cols);
+			//print2DBoard(markedBoard, rows, cols);
 			if (validShape == true)
 			{
 				if (currPlayer == 0)
@@ -326,43 +323,49 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			}
 		}
 	}	
-	print2DBoard(markedBoard, rows, cols);
+	//print2DBoard(markedBoard, rows, cols);
 	// finish scanning the board
+}
+
+bool GameUtils::checkSingleTile(char2DArray& board, int rows, int cols, int posI, int posJ)
+{
+	bool isValid = true;
+	if (posI != 0)			//upper bound
+	{
+		if (board[posI - 1][posJ] != ' ')
+			isValid = false;
+	}
+	if (posI != rows - 1)	//lower bound
+	{
+		if (board[posI + 1][posJ] != ' ')
+			isValid = false;
+	}
+	if (posJ != 0)			//left bound
+	{
+		if (board[posI][posJ - 1] != ' ')
+			isValid = false;
+	}
+	if (posJ != cols - 1)	//right bound
+	{
+		if (board[posI][posJ + 1] != ' ')
+			isValid = false;
+	}
+
+	return isValid;
 }
 
 bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player)
 {
-	bool checkValid = true;
 	// check if it is a single tile
 	if (board[posI][posJ] != 'B' && board[posI][posJ] != 'b') {
-		if (posI != 0)			//upper bound
-		{
-			if (board[posI - 1][posJ] != ' ') 
-				checkValid = false;
-		}
-		if (posI != rows - 1)	//lower bound
-		{
-			if (board[posI + 1][posJ] != ' ')
-				checkValid = false;
-		}
-		if (posJ != 0)			//left bound
-		{
-			if (board[posI][posJ - 1] != ' ')
-				checkValid = false;
-		}
-		if (posJ != cols - 1)	//right bound
-		{
-			if (board[posI][posJ + 1] != ' ')
-				checkValid = false;
-		}
-		if (checkValid) {
+		if (checkSingleTile(board, rows, cols, posI, posJ)) {
 			markedBoard[posI][posJ] = 'X';
 			return false;
 		}
 	}
 	
 	int countTiles = 0, possibleAdj = 0, special = false;
-	checkValid = true;
+	bool checkValid = true;
 	int limit = min(posJ + shipSize, cols);
 
 	// check horizontal shape
@@ -539,6 +542,15 @@ bool GameUtils::checkBound(char2DArray& board, char shipType, int i, int j, int*
 	return false;
 }
 
+void GameUtils::print1DBoard(unique_ptr<int[]>& board, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		cout << board[i] << " ";
+	}
+	cout << " " << endl;
+}
+
 
 void GameUtils::print3DBoard(char3DArray& board, int rows, int cols, int depth)
 {
@@ -558,15 +570,6 @@ void GameUtils::print3DBoard(char3DArray& board, int rows, int cols, int depth)
 	}
 	cout << "===================================";
 	cout << endl;
-}
-
-void GameUtils::print1DBoard(unique_ptr<int[]>& board, int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		cout << board[i] << " ";
-	}
-	cout << " " << endl;
 }
 
 void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
@@ -594,7 +597,6 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<c
 		// parsing the board to 3D char array	
 		int rows, cols, depth;
 		char3DArray board = parseBoard(path, boardNames[j], rows, cols, depth);
-		print3DBoard(board, rows, cols, depth);
 		if (board != nullptr)	// parsing failed
 		{
 			// check if the board is valid
@@ -607,6 +609,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<c
 			// TODO: possible bonus here
 			else
 			{
+				cout << "Board #" << (j + 1) << " ERRORS:" << endl;
 				for (int i = 0; i < 5; i++)
 				{
 					if (mistakes[i] != 0)
@@ -635,6 +638,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<c
 						}
 					}
 				}
+				cout << endl;
 			}	// end of else
 		}
 	}

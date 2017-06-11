@@ -72,13 +72,10 @@ public:
 
 	//Check if the board is valid
 	static bool checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
-
 	static bool checkShape(char2DArray& board, char2DArray& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
-
 	static bool checkBound(char2DArray& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj);
-
 	static void checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);
-
+	static bool checkSingleTile(char2DArray& board, int rows, int cols, int posI, int posJ);
 	static char2DArray getBoardCut(char3DArray& board, int rows, int cols, int depth, int cutBy);
 
 	//Prints the board to console (for debug purposes)
