@@ -56,7 +56,7 @@ public:
 	static int parsePath(const string& basePath, vector<string>& boardNames);
 
 	//Loads all legal boards to vector
-	static int getBoards(const string& path, vector<string>& boardNames, vector<char3DArray>& boards);
+	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<tuple<char3DArray, int, int, int>>& boards);
 
 	//Parse board from .sboard file
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);

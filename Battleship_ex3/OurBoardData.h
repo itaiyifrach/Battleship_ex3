@@ -4,11 +4,7 @@
 class OurBoardData: public BoardData
 {
 public:
-	OurBoardData(unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> board, int rows, int cols, int depth,int playerNum): _rows(rows),_cols(cols),_depth(depth),_playerNum(playerNum)
-	{
-
-		
-	};
+	OurBoardData(char3DArray* board, int rows, int cols, int depth,int playerNum): _rows(rows),_cols(cols),_depth(depth),_playerNum(playerNum), _board(board){};
 	virtual ~OurBoardData() = default;
 	//returns only selected players' chars
 	virtual char charAt(Coordinate c) const override;
@@ -19,5 +15,5 @@ protected:
 	int _depth = 0; 
 	int _playerNum = 0;
 private:
-	unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> board;
+	char3DArray* _board;
 };

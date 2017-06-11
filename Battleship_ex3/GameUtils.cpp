@@ -324,7 +324,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 		}
 	}	
 	//print2DBoard(markedBoard, rows, cols);
-	// finish scanning the board
+	//finished scanning the board
 }
 
 bool GameUtils::checkSingleTile(char2DArray& board, int rows, int cols, int posI, int posJ)
@@ -588,7 +588,7 @@ void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
 	cout << " " << endl;
 }
 
-int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<char3DArray>& boards)
+int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<tuple<char3DArray,int,int,int>>& boards)
 {
 	char shipMistakeTypeA, shipMistakeTypeB;
 	int numOfBoards = 0;
@@ -603,7 +603,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<c
 			int mistakes[5] = { 0 };			
 			if (checkBoard(board, rows, cols, depth, mistakes) != false)
 			{				
-				boards.push_back(std::move(board));
+				boards.push_back(make_tuple(std::move(board),rows,cols,depth));
 				numOfBoards++;				
 			}
 			// TODO: possible bonus here
