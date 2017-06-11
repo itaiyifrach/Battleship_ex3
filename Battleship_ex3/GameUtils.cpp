@@ -44,6 +44,25 @@ char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 	return board;
 }
 
+char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
+{
+	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
+	for (int i = 0; i < rows; i++)
+	{
+		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
+		for (int j = 0; j < cols; j++)
+		{
+			board[i][j] = make_unique<char[]>(depth);
+			for (int k = 0; k < depth; k++)
+			{
+				board[i][j][k] =from[i][j][k];
+			}
+		}
+	}
+	return board;
+
+}
+
 int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
 	HANDLE dir;

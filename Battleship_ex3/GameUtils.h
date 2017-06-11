@@ -44,11 +44,11 @@ public:
 	//Parses input args.
 	static void parseArgs(int argc, char** argv, string& basePath, int& numOfThreads);
 
-	// Dynamically allocate a 3D array
+	// Board Utils
 	static char3DArray allocateBoard(int rows, int cols, int depth);
+	static char3DArray copyBoard(char3DArray& from,int rows, int cols, int depth);
 
-	//Dynamically deallocate a 3D array
-	//static void destroyBoard(char*** board, int rows, int cols, int depth);
+
 
 	static vector<string> split(string str, char delimiter);
 
@@ -81,9 +81,8 @@ public:
 	//Prints the board to console (for debug purposes)
 	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
 	static void print2DBoard(char2DArray& board, int rows, int cols);
-	static void print1DBoard(unique_ptr<int[]>& board, int n);
+	static void print1DBoard(unique_ptr<int[]>& board, int n);	
 	
-	//static char** initPlayerBoard(char** mainBoard, int playerNum);
 
 	//check if ship is horizontal or vertical
 	static bool isVertical(char** board, int rows, int cols, int i, int j);

@@ -1,18 +1,18 @@
-/*
+
 #include "BattleshipGame.h"
 
 
-void BattleshipGame::playGame(bool useAnimation, int delay) {
+void BattleshipGame::playGame() {
 	//0 iff its A's turn
 	int turnOf = 0;
 	bool endGame = false;
 
 	//initialize first attack (check if A/B have moves)
-	pair<int, int> currAttack = PlayerA->attack();
-	if (currAttack.first == -1)	
+	Coordinate currAttack = PlayerA->attack();
+	if (currAttack.row == -1)	
 	{
 		currAttack = PlayerB->attack();
-		if (currAttack.first == -1)	
+		if (currAttack.row == -1)	
 		{
 			endGame = true;
 		} 
@@ -22,30 +22,21 @@ void BattleshipGame::playGame(bool useAnimation, int delay) {
 		}
 	}
 
-	// printing the starting colored board:
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (useAnimation) {
-		system("cls");						// clearing the console
-		printColorBoard(&hConsole, turnOf);	// printing stating board
-		hideCursor(&hConsole);				// hiding the console cursor
-		Sleep(delay);
-	}
-
 	while ((!endGame) && (numOfShipsA) && (numOfShipsB)) {
 		//attacks are saved between 1..ROWS in the files. We shift the coordinates to 0..(ROWS-1)
-		int i = currAttack.first - 1;
-		int j = currAttack.second - 1;
-		
+		int i = currAttack.row - 1;
+		int j = currAttack.col - 1;
+		int k = currAttack.depth - 1;
 		bool selfHit = false;
-		if (GameUtils::selfHit(mainBoard[i][j], turnOf)) {
+		if (GameUtils::selfHit(mainBoard[i][j][k], turnOf)) {
 			selfHit = true;
 		}
 
-		//check for the sink-score of the ship in (i,j)th sector
-		int sectorScore = GameUtils::getScoreForSector(mainBoard[i][j]);
+		//check for the sink-score of the ship in (i,j,k)th sector
+		int sectorScore = GameUtils::getScoreForSector(mainBoard[i][j][k]);
 
 		//check for the attack result and update the mainBoard according to the result
-		pair<AttackResult, bool> AttackResTupple = getAttackResult(i, j);
+		pair<AttackResult, bool> AttackResTupple = getAttackResult(i, j, k);
 		AttackResult currAttackRes = AttackResTupple.first;
 		bool wasAlreadyHit = AttackResTupple.second;
 		
@@ -65,14 +56,10 @@ void BattleshipGame::playGame(bool useAnimation, int delay) {
 		}			
 		
 		//Notify players on results
-		PlayerA->notifyOnAttackResult(turnOf, i+1, j+1, currAttackRes);
-		PlayerB->notifyOnAttackResult(turnOf, i+1, j+1, currAttackRes);
+		//TODO-is the change from i+1,j+1 to currAttack is fine?
+		PlayerA->notifyOnAttackResult(turnOf,currAttack, currAttackRes);
+		PlayerB->notifyOnAttackResult(turnOf, currAttack, currAttackRes);
 
-		// updating the colored board with the attack results:
-		if (useAnimation) {
-			updateColorBoard(&hConsole, i, j, turnOf, currAttackRes, selfHit, delay);
-			Sleep(delay);
-		}
 
 		//Switch if current player missed / made a self-hit
 		if ((currAttackRes == AttackResult::Miss) 
@@ -91,11 +78,6 @@ void BattleshipGame::playGame(bool useAnimation, int delay) {
 		getNextAttack(turnOf, endGame, currAttack);
 	}	// end of while
 
-	if (useAnimation) {
-		// skipping the color board in order to print the results
-		gotoxy(GameUtils::rows + 9, 0);
-		SetConsoleTextAttribute(hConsole, WHITE_COLOR);
-	}
 
 	if ((numOfShipsA) && (!numOfShipsB))
 		cout << PLAYER_A_WON_STR << endl;
@@ -106,15 +88,15 @@ void BattleshipGame::playGame(bool useAnimation, int delay) {
 	cout << PLAYER_B_POINTS_STR << scoreB << endl;
 }
 
-void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, pair<int, int>& currAttack) const
+void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currAttack) const
 {
 	if (turnOf == 0)
 	{
 		currAttack = PlayerA->attack();
-		if (currAttack.first == -1)
+		if (currAttack.row == -1)
 		{
 			currAttack = PlayerB->attack();
-			if (currAttack.first == -1)
+			if (currAttack.row == -1)
 			{
 				endGame = true;
 			} else {
@@ -125,10 +107,10 @@ void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, pair<int, int>& c
 	else
 	{
 		currAttack = PlayerB->attack();
-		if (currAttack.first == -1)
+		if (currAttack.row == -1)
 		{
 			currAttack = PlayerA->attack();
-			if (currAttack.first == -1)
+			if (currAttack.row == -1)
 			{
 				endGame = true;
 			}
@@ -140,17 +122,17 @@ void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, pair<int, int>& c
 	}
 }
 
-std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i, int j) const{
+std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k) const {
 	std::pair<AttackResult, bool> result;
-	if (mainBoard[i][j] == 32) {
+	if (mainBoard[i][j][k] == 32) {
 		result.first = AttackResult::Miss;
 		result.second = false;
 	}
-	else if (mainBoard[i][j] == 'X') {
+	else if (mainBoard[i][j][k]== 'X') {
 		result.first = AttackResult::Hit;
 		result.second = true;
 	}
-	else if (updateBaordAndCheckSink(i, j)) {
+	else if (updateBoardAndCheckSink(i, j, k)) {
 		result.first = AttackResult::Sink;
 		result.second = false;
 	}
@@ -161,7 +143,7 @@ std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i, int j) cons
 	return result;
 }
 
-bool BattleshipGame::updateBaordAndCheckSink(int i, int j) const {
+bool BattleshipGame::updateBoardAndCheckSink(int i, int j, int k) const {
 	if (GameUtils::isVertical(mainBoard, GameUtils::rows, GameUtils::cols, i, j)) {
 		int rowIndex = i;
 		//find upper corner and save it in "upper"

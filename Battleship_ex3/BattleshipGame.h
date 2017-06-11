@@ -1,4 +1,5 @@
-/*
+#pragma once
+
 #include "GameUtils.h"
 #include <windows.h>
 
@@ -24,63 +25,42 @@ class BattleshipGame
 {
 	IBattleshipGameAlgo* PlayerA;
 	IBattleshipGameAlgo* PlayerB;
-	int numOfShipsA = SHIPS_NUM;
-	int numOfShipsB = SHIPS_NUM;
+	int numOfShipsA;
+	int numOfShipsB;
+	int rows;
+	int cols;
+	int depth;
 	int scoreA = 0;
 	int scoreB = 0;
-	char** mainBoard;
-	char** cleanInitialBoard;
+	char3DArray mainBoard;
+	
 
 public:
-	BattleshipGame(IBattleshipGameAlgo* playerA, IBattleshipGameAlgo* playerB, char** board)
-		: PlayerA(playerA), PlayerB(playerB) {
+	BattleshipGame(IBattleshipGameAlgo* playerA, IBattleshipGameAlgo* playerB, char3DArray& board,int numOfShipsA, int numOfShipsB, int rows,int cols,int depth): 
+	PlayerA(playerA), PlayerB(playerB), numOfShipsA(numOfShipsA), numOfShipsB(numOfShipsB), rows(rows), cols(cols), depth(depth)
+	{
+		mainBoard = GameUtils::copyBoard(board, rows, cols, depth);
 
-		//copy mainBoard
-		this->mainBoard = new char*[GameUtils::rows];
-		this->cleanInitialBoard = new char*[GameUtils::rows];
-		for (int i = 0; i < GameUtils::rows; ++i)
-		{
-			this->mainBoard[i] = new char[GameUtils::cols];
-			this->cleanInitialBoard[i] = new char[GameUtils::cols];
-			for (int j = 0; j < GameUtils::cols; ++j)
-			{
-				this->mainBoard[i][j] = board[i][j];
-				this->cleanInitialBoard[i][j] = board[i][j];
-			}	
-		}
 	}
 
 	BattleshipGame(const BattleshipGame&) = delete;
 
 	BattleshipGame& operator=(const BattleshipGame&) = delete;
 
-	~BattleshipGame() {
-		for (int i = 0; i < GameUtils::rows; i++)
-			delete mainBoard[i];
-		delete[](mainBoard);
-		for (int i = 0; i < GameUtils::rows; i++)
-			delete cleanInitialBoard[i];
-		delete[](cleanInitialBoard);
-	}
+	~BattleshipGame() {	};
 
 	//Main loop of the gameplay
-	void playGame(bool useAnimation, int delay);
+	void playGame();
 
 private:
-	// returns attack result of the attack in coor(i,j) and updates mainBoard using "updateBaordAndCheckSink"
-	std::pair<AttackResult, bool> getAttackResult(int i, int j) const;
+	// returns attack result of the attack in coor(i,j,k) and updates mainBoard using "updateBoardAndCheckSink"
+	std::pair<AttackResult, bool> getAttackResult(int i,int j,int k) const;
 
 	//called by getAttackResult. Checks if the attack resulted by a sink and updates the mainBoard according to attack result:
 	//if it's a sink, erases the ship and returns true
-	//if it isn't a sink, updates the (i,j)th coordinate as 'X' (for hit) and returns false
-	bool updateBaordAndCheckSink(int i, int j) const;
+	//if it isn't a sink, updates the (i,j,k)th coordinate as 'X' (for hit) and returns false
+	bool updateBoardAndCheckSink(int i, int j,int k) const;
 
-	void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, pair<int, int>& currAttack) const;
+	void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currAttack) const;
 
-	// animation functions
-	void printColorBoard(HANDLE* hConsole, int turnOf) const;
-	static void gotoxy(int i, int j);
-	void updateColorBoard(HANDLE* hConsole, int i, int j, int turnOf, AttackResult attackResult, bool selfHit, int delay) const;
-	static void hideCursor(HANDLE* hConsole);
 };
-*/
