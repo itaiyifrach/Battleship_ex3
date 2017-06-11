@@ -79,11 +79,12 @@ public:
 
 	static void checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);
 
-	static char2DArray getBoardCut(char3DArray& board, int rows, int cols, int depth, bool cutByDepth);
+	static char2DArray getBoardCut(char3DArray& board, int rows, int cols, int depth, int cutBy);
 
 	//Prints the board to console (for debug purposes)
 	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
 	static void print2DBoard(char2DArray& board, int rows, int cols);
+	static void print1DBoard(unique_ptr<int[]>& board, int n);
 	
 	//static char** initPlayerBoard(char** mainBoard, int playerNum);
 

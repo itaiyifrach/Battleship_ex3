@@ -148,7 +148,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	return board;
 }
 
-char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int depth, bool cutByDepth)
+char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int depth, int cutBy)
 {
 	char2DArray boardCut = make_unique<unique_ptr<char[]>[]>(rows);
 	for (int i = 0; i < rows; i++) {
@@ -158,11 +158,19 @@ char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int d
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++)
 		{
-			if (!cutByDepth) {
-				boardCut[i][j] = board[i][j][depth];
-			}
-			else {
+			switch (cutBy)
+			{
+			case 0:		// by rows
+				boardCut[i][j] = board[depth][j][i];
+				break;
+			case 1:		// by cols
 				boardCut[i][j] = board[i][depth][j];
+				break;
+			case 2:		// by depth
+				boardCut[i][j] = board[i][j][depth];
+				break;
+			default:
+				continue;
 			}
 		}
 	}
@@ -180,17 +188,31 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 	// checking cuts by DEPTH
 	for (int i = 0; i < depth; i++)
 	{
-		boardCut = getBoardCut(board, rows, cols, i, false);
+		boardCut = getBoardCut(board, rows, cols, i, 2);
 		print2DBoard(boardCut, rows, cols);
 		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
+		print1DBoard(shipsTypeA, 5);
+		print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by COLS
 	for (int i = 0; i < cols; i++)
 	{
-		boardCut = getBoardCut(board, rows, depth, i, true);
+		boardCut = getBoardCut(board, rows, depth, i, 1);
 		print2DBoard(boardCut, rows, depth);
 		checkBoardCut(boardCut, rows, depth, mistakes, shipsTypeA, shipsTypeB);
+		print1DBoard(shipsTypeA, 5);
+		print1DBoard(shipsTypeB, 5);
+	}
+
+	// checking cuts by ROWS
+	for (int i = 0; i < rows; i++)
+	{
+		boardCut = getBoardCut(board, depth, cols, i, 0);
+		print2DBoard(boardCut, depth, cols);
+		checkBoardCut(boardCut, depth, cols, mistakes, shipsTypeA, shipsTypeB);
+		print1DBoard(shipsTypeA, 5);
+		print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking number of valid ships of players A and B:
@@ -198,8 +220,8 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 		mistakes[3] = 1;
 	}
 	// checking if players A and B have the same ships types:
-	if (shipsTypeA[0] != shipsTypeB[0] || shipsTypeA[1] != shipsTypeB[1] && shipsTypeA[2] != shipsTypeB[2]
-		&& shipsTypeA[3] != shipsTypeB[3]) {
+	if (shipsTypeA[1] != shipsTypeB[1] || shipsTypeA[2] != shipsTypeB[2] || shipsTypeA[3] != shipsTypeB[3]
+		|| shipsTypeA[4] != shipsTypeB[4]) {
 		mistakes[4] = 1;
 	}
 
@@ -288,7 +310,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			default:
 				continue;
 			}
-
+			print2DBoard(markedBoard, rows, cols);
 			if (validShape == true)
 			{
 				if (currPlayer == 0)
@@ -304,6 +326,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			}
 		}
 	}	
+	print2DBoard(markedBoard, rows, cols);
 	// finish scanning the board
 }
 
@@ -312,9 +335,9 @@ bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int row
 	bool checkValid = true;
 	// check if it is a single tile
 	if (board[posI][posJ] != 'B' && board[posI][posJ] != 'b') {
-		if (posI != 0)	//upper bound
+		if (posI != 0)			//upper bound
 		{
-			if (board[posI][posJ - 1] != ' ')
+			if (board[posI - 1][posJ] != ' ') 
 				checkValid = false;
 		}
 		if (posI != rows - 1)	//lower bound
@@ -322,7 +345,7 @@ bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int row
 			if (board[posI + 1][posJ] != ' ')
 				checkValid = false;
 		}
-		if (posJ != 0)	//left bound
+		if (posJ != 0)			//left bound
 		{
 			if (board[posI][posJ - 1] != ' ')
 				checkValid = false;
@@ -339,6 +362,7 @@ bool GameUtils::checkShape(char2DArray& board, char2DArray& markedBoard, int row
 	}
 	
 	int countTiles = 0, possibleAdj = 0, special = false;
+	checkValid = true;
 	int limit = min(posJ + shipSize, cols);
 
 	// check horizontal shape
@@ -534,6 +558,15 @@ void GameUtils::print3DBoard(char3DArray& board, int rows, int cols, int depth)
 	}
 	cout << "===================================";
 	cout << endl;
+}
+
+void GameUtils::print1DBoard(unique_ptr<int[]>& board, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		cout << board[i] << " ";
+	}
+	cout << " " << endl;
 }
 
 void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
