@@ -56,7 +56,7 @@ public:
 	static int parsePath(const string& basePath, vector<string>& boardNames);
 
 	//Loads all legal boards to vector
-	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<tuple<char3DArray, int, int, int>>& boards);
+	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<tuple<char3DArray, int, int, int, int>>& boards);
 
 	//Parse board from .sboard file
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
@@ -71,7 +71,7 @@ public:
 	static int getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
 
 	//Check if the board is valid
-	static bool checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
+	static int checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
 	static bool checkShape(char2DArray& board, char2DArray& markedBoard, int rows, int cols, int posI, int posJ, char shipType, int shipSize, int* mistakes, int player);
 	static bool checkBound(char2DArray& board, char shipType, int i, int j, int* mistakes, int player, int* possibleAdj);
 	static void checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB);

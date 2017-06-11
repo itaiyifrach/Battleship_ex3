@@ -168,7 +168,7 @@ char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int d
 				boardCut[i][j] = board[i][j][depth];
 				break;
 			default:
-				continue;
+				break;
 			}
 		}
 	}
@@ -176,7 +176,7 @@ char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int d
 	return boardCut;
 }
 
-bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes)
+int GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes)
 {
 	char2DArray boardCut;
 	bool isValidBoard = true;
@@ -212,7 +212,6 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 		//print1DBoard(shipsTypeA, 5);
 		//print1DBoard(shipsTypeB, 5);
 	}
-
 	// checking number of valid ships of players A and B:
 	if (shipsTypeA[0] != shipsTypeB[0]) {
 		mistakes[3] = 1;
@@ -228,8 +227,21 @@ bool GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, in
 			isValidBoard = false;
 		}
 	}
-	
-	return isValidBoard;
+
+	if (isValidBoard)
+	{
+		int numOfShips = 0;
+		// fixing ships counts due to over count with the cuts
+		for (int i = 1; i < 5; i++)
+		{
+			if (i == 1)
+				numOfShips += (shipsTypeA[i] / 3);
+			else
+				numOfShips += (shipsTypeA[i] / 2);
+		}
+		return numOfShips;
+	}
+	return -1;
 }
 
 /*	
@@ -588,22 +600,23 @@ void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
 	cout << " " << endl;
 }
 
-int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<tuple<char3DArray,int,int,int>>& boards)
+int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<tuple<char3DArray,int,int,int,int>>& boards)
 {
 	char shipMistakeTypeA, shipMistakeTypeB;
 	int numOfBoards = 0;
 	for (int j = 0; j < boardNames.size(); j++)
 	{
 		// parsing the board to 3D char array	
-		int rows, cols, depth;
+		int rows, cols, depth, numOfShips;
 		char3DArray board = parseBoard(path, boardNames[j], rows, cols, depth);
 		if (board != nullptr)	// parsing failed
 		{
 			// check if the board is valid
-			int mistakes[5] = { 0 };			
-			if (checkBoard(board, rows, cols, depth, mistakes) != false)
+			int mistakes[5] = { 0 };
+			numOfShips = checkBoard(board, rows, cols, depth, mistakes);
+			if (numOfShips != -1)
 			{				
-				boards.push_back(make_tuple(std::move(board),rows,cols,depth));
+				boards.push_back(make_tuple(std::move(board),rows,cols,depth,numOfShips));
 				numOfBoards++;				
 			}
 			// TODO: possible bonus here
