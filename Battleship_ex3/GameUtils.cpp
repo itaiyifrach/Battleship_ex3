@@ -1,5 +1,5 @@
 #include "GameUtils.h"
-#include <memory>
+
 
 void GameUtils::parseArgs(int argc, char** argv, string& basePath, int& numOfThreads) {
 	// setting cwd as default path
@@ -119,6 +119,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	
 	// getting first line, which includes the dimentions of the board
 	getline(ifs, line);
+	std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 	vector<string> tokens = split(line, 'x');
 	if (tokens.size() != 3) {
 		// TODO: possible bonus here
@@ -749,31 +750,8 @@ int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<p
 
 	return numOfPlayers;
 }
-/*
-char** GameUtils::initPlayerBoard(char** mainBoard, int playerNum) {
-	char** playerBoard = new char*[rows];
-	for (int i = 0; i < rows; ++i)
-	{
-		playerBoard[i] = new char[cols];
-		for (int j = 0; j < cols; j++) {
-			if (playerNum == 0) {
-				if ((65 < mainBoard[i][j]) && (mainBoard[i][j] < 90))
-					playerBoard[i][j] = mainBoard[i][j];
-				else
-					playerBoard[i][j] = 32;
-			}
-			else {
-				if ((97 < mainBoard[i][j]) && (mainBoard[i][j] < 122))
-					playerBoard[i][j] = mainBoard[i][j];
-				else
-					playerBoard[i][j] = 32;
-			}
-		}
-	}
-	return playerBoard;
-}
-*/
 
+//TODO-change function to support 3D board
 bool GameUtils::isVertical(char** board, int rows, int cols, int i, int j) {
 	if (((j == 0) && ((board[i][1] == 32) || (board[i][1] == '%'))) || ((j == (cols - 1)) && ((board[i][cols - 2] == 32) || (board[i][cols - 2] == '%'))))
 		return true;

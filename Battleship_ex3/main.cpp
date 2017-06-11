@@ -1,4 +1,5 @@
 #include "GameUtils.h"
+#include "BattleshipGame.h"
 
 int main(int argc, char** argv) 
 {
@@ -15,18 +16,18 @@ int main(int argc, char** argv)
 	{
 		return -1;
 	}
-	/*
+	
 	//creates a vector of all *.dll files in the given path
 	vector<string> dllNames = GameUtils::getDLLNames(basePath);
 	//check if number of dll's/boards is invalid (errors printed inside functions)
 	if(dllNames.size() < 2 || check == -1)
 	{
 		return -1;
-	}*/
+	}
 	//loads all boards
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
 	cout << "# of Valid BOARDS = " << numOfBoards << endl;
-	/*
+	
 	//loads all dll's
 	numOfPlayers = GameUtils::getPlayers(basePath,dllNames,playersVec);
 	//print number of legal players and boards
@@ -39,17 +40,14 @@ int main(int argc, char** argv)
 		GameUtils::freeLibs(playersVec);
 		return -1;
 	}
-	*/
 
+	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
+	BattleshipGame game1(boardVec[0], playerVec[0]);
 
 	//prepare all the games
+	
 
-	/*
-	BattleshipGame game(playerA, playerB, mainBoard);
-	game.playGame(useAnimation, delay);
-	FreeLibrary(playerAdll.second);
-	FreeLibrary(playerBdll.second);
-	return 0;
-	*/
+
+	GameUtils::freeLibs(playersVec);
 	return 0;
 }

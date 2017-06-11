@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameUtils.h"
+#include "OurBoardData.h"
 #include <windows.h>
 
 #define PLAYER_A_WON_STR "Player A won"
@@ -36,10 +37,22 @@ class BattleshipGame
 	
 
 public:
-	BattleshipGame(IBattleshipGameAlgo* playerA, IBattleshipGameAlgo* playerB, char3DArray& board,int numOfShipsA, int numOfShipsB, int rows,int cols,int depth): 
-	PlayerA(playerA), PlayerB(playerB), numOfShipsA(numOfShipsA), numOfShipsB(numOfShipsB), rows(rows), cols(cols), depth(depth)
+	BattleshipGame(tuple<char3DArray, int, int, int, int> board_tuple,pair<unique_ptr<IBattleshipGameAlgo>, unique_ptr<IBattleshipGameAlgo>> player_pair)
 	{
-		mainBoard = GameUtils::copyBoard(board, rows, cols, depth);
+		numOfShipsA = std::get<4>(board_tuple);
+		numOfShipsB = std::get<4>(board_tuple);
+		rows = std::get<1>(board_tuple);
+		cols = std::get<2>(board_tuple);
+		depth = std::get<3>(board_tuple);		
+		mainBoard = GameUtils::copyBoard(std::get<0>(board_tuple), rows, cols, depth);
+		PlayerA = player_pair.first.release();
+		PlayerB = player_pair.second.release();
+		PlayerA->setPlayer(PLAYER_A_NUM);
+		PlayerB->setPlayer(PLAYER_B_NUM);
+		OurBoardData player_a_board_data(std::get<0>(board_tuple), rows, cols, depth, PLAYER_A_NUM);		
+		OurBoardData player_b_board_data(std::get<0>(board_tuple), rows, cols, depth, PLAYER_B_NUM);
+		PlayerA->setBoard(player_a_board_data);
+		PlayerB->setBoard(player_b_board_data);
 
 	}
 
@@ -47,7 +60,7 @@ public:
 
 	BattleshipGame& operator=(const BattleshipGame&) = delete;
 
-	~BattleshipGame() {	};
+	~BattleshipGame() = default;
 
 	//Main loop of the gameplay
 	void playGame();

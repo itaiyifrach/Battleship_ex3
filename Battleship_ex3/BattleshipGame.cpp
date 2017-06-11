@@ -142,7 +142,7 @@ std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k)
 	}
 	return result;
 }
-
+/*
 bool BattleshipGame::updateBoardAndCheckSink(int i, int j, int k) const {
 	if (GameUtils::isVertical(mainBoard, GameUtils::rows, GameUtils::cols, i, j)) {
 		int rowIndex = i;
@@ -199,7 +199,7 @@ bool BattleshipGame::updateBoardAndCheckSink(int i, int j, int k) const {
 		return false;
 	}
 }
-
+*/
 /*void BattleshipGame::printColorBoard(HANDLE* hConsole, int turnOf) const
 {
 	// printing the board frame:
