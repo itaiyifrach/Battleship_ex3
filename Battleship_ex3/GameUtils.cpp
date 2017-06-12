@@ -14,6 +14,10 @@ void GameUtils::parseArgs(int argc, char** argv, string& basePath, int& numOfThr
 		if (strcmp(argv[i], "-threads") == 0)
 		{
 			numOfThreads = atoi(argv[i + 1]);
+			if (numOfThreads <= 0)		// if number is invalid, set default
+			{
+				numOfThreads = THREADS_DEFAULT;
+			}
 			break;
 		}
 	}

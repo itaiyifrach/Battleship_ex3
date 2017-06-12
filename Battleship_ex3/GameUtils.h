@@ -33,6 +33,7 @@
 #define BOARD_MISTAKE_2 "Adjacent Ships on Board"
 #define BOARD_MISTAKE_3 "The players don't have the same number of ships"
 #define BOARD_MISTAKE_4 "The players don't have the same types of ships"
+#define THREADS_DEFAULT 4
 
 using namespace std;
 typedef unique_ptr<unique_ptr<char[]>[]> char2DArray;

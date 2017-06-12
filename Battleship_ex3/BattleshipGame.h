@@ -3,24 +3,11 @@
 #include "GameUtils.h"
 #include "OurBoardData.h"
 
-
 #define PLAYER_A_WON_STR "Player A won"
 #define PLAYER_B_WON_STR "Player B won"
 #define POINTS_STR "Points:"
 #define PLAYER_A_POINTS_STR "Player A: "
 #define PLAYER_B_POINTS_STR "Player B: "
-#define PLAYER_A_COLOR 9	//blue
-#define PLAYER_B_COLOR 12	//red
-#define SEA_COLOR 11
-#define WHITE_COLOR 15
-#define BOMB_COLOR 14	//yellow
-#define MISS_MSG "MISSED!       "
-#define HIT_MSG "HIT!          "
-#define SINK_A_MSG "SANK B's ship!"
-#define SINK_B_MSG "SANK A's ship!"
-#define SELF_HIT_MSG "SELF HIT!     "
-#define CLEAN_MSG "                        "
-
 
 class BattleshipGame
 {

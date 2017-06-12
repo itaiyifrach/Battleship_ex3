@@ -1,8 +1,6 @@
 #include "GameUtils.h"
 #include "BattleshipGame.h"
 
-#define THREADS_DEFAULT 4
-
 int main(int argc, char** argv) 
 {
 	string basePath;
@@ -44,7 +42,7 @@ int main(int argc, char** argv)
 	}
 
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	BattleshipGame game1(boardVec[0], playerVec[0]);
+	BattleshipGame game1(boardVec[0], playersVec[0]);
 
 	//prepare all the games
 	
