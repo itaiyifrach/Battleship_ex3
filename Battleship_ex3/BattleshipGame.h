@@ -2,7 +2,7 @@
 
 #include "GameUtils.h"
 #include "OurBoardData.h"
-#include <windows.h>
+
 
 #define PLAYER_A_WON_STR "Player A won"
 #define PLAYER_B_WON_STR "Player B won"
@@ -47,12 +47,7 @@ public:
 		mainBoard = GameUtils::copyBoard(std::get<0>(board_tuple), rows, cols, depth);
 		PlayerA = player_pair.first.release();
 		PlayerB = player_pair.second.release();
-		PlayerA->setPlayer(PLAYER_A_NUM);
-		PlayerB->setPlayer(PLAYER_B_NUM);
-		OurBoardData player_a_board_data(std::get<0>(board_tuple), rows, cols, depth, PLAYER_A_NUM);		
-		OurBoardData player_b_board_data(std::get<0>(board_tuple), rows, cols, depth, PLAYER_B_NUM);
-		PlayerA->setBoard(player_a_board_data);
-		PlayerB->setBoard(player_b_board_data);
+		playGame();
 
 	}
 
@@ -67,12 +62,15 @@ public:
 
 private:
 	// returns attack result of the attack in coor(i,j,k) and updates mainBoard using "updateBoardAndCheckSink"
-	std::pair<AttackResult, bool> getAttackResult(int i,int j,int k) const;
+	std::pair<AttackResult, bool> getAttackResult(int i,int j,int k);
 
 	//called by getAttackResult. Checks if the attack resulted by a sink and updates the mainBoard according to attack result:
 	//if it's a sink, erases the ship and returns true
 	//if it isn't a sink, updates the (i,j,k)th coordinate as 'X' (for hit) and returns false
 	bool updateBoardAndCheckSink(int i, int j,int k) const;
+
+	//check if ship is horizontal or vertical or
+	int BattleshipGame::shipDirection(int i, int j, int k) const;
 
 	void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currAttack) const;
 

@@ -82,10 +82,6 @@ public:
 	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
 	static void print2DBoard(char2DArray& board, int rows, int cols);
 	static void print1DBoard(unique_ptr<int[]>& board, int n);	
-	
-
-	//check if ship is horizontal or vertical
-	static bool isVertical(char** board, int rows, int cols, int i, int j);
 
 	//returns the score-for-a-sink of a ship which is located in (i,j)th coordinate on mainBoard
 	static int getScoreForSector(char boardSymbol);

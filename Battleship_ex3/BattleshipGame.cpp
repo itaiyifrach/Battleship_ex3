@@ -6,7 +6,12 @@ void BattleshipGame::playGame() {
 	//0 iff its A's turn
 	int turnOf = 0;
 	bool endGame = false;
-
+	PlayerA->setPlayer(PLAYER_A_NUM);
+	PlayerB->setPlayer(PLAYER_B_NUM);
+	OurBoardData player_a_board_data(mainBoard, rows, cols, depth, PLAYER_A_NUM);
+	OurBoardData player_b_board_data(mainBoard, rows, cols, depth, PLAYER_B_NUM);
+	PlayerA->setBoard(player_a_board_data);
+	PlayerB->setBoard(player_b_board_data);
 	//initialize first attack (check if A/B have moves)
 	Coordinate currAttack = PlayerA->attack();
 	if (currAttack.row == -1)	
@@ -122,7 +127,7 @@ void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currA
 	}
 }
 
-std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k) const {
+std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k)  {
 	std::pair<AttackResult, bool> result;
 	if (mainBoard[i][j][k] == 32) {
 		result.first = AttackResult::Miss;
@@ -142,64 +147,144 @@ std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k)
 	}
 	return result;
 }
-/*
-bool BattleshipGame::updateBoardAndCheckSink(int i, int j, int k) const {
-	if (GameUtils::isVertical(mainBoard, GameUtils::rows, GameUtils::cols, i, j)) {
-		int rowIndex = i;
-		//find upper corner and save it in "upper"
-		while ((rowIndex > 0) && (mainBoard[rowIndex][j] != 32))
-			rowIndex--;	
-		if (mainBoard[rowIndex][j] == 32)
-			rowIndex++;
-		int upper = rowIndex;
 
-		//count how many parts of the ship remain un-hit
-		int count = 0;
-		while ((rowIndex < GameUtils::rows) && (mainBoard[rowIndex][j] != 32)) {
-			if (mainBoard[rowIndex][j] != 'X')
-				count++;
-			rowIndex++;
-		}
-
-		//if we have only one un-hit part and it was the initial part in (i,j), we erase the ship and return that it's a sink
-		if ((count == 1) && (mainBoard[i][j]!='X') && (mainBoard[i][j] != 32)) {
-			rowIndex = upper;
-			while ((rowIndex < GameUtils::rows) && (mainBoard[rowIndex][j] != 32))
-				mainBoard[rowIndex++][j] = 32;
-			return true;
-		}
-		//if it's not a sink we just update the (i,j) coordinate on the mainBoard as a hit and return it isn't a sink
-		mainBoard[i][j] = 'X';
-		return false;
-	}
-	else {
+bool BattleshipGame::updateBoardAndCheckSink(int i, int j, int k) const
+{
+	auto direction = shipDirection(i, j, k);
+	//horizontal
+	if (direction == 0) 
+	{
 		int colIndex = j;
 		//find left corner and save it in "left"
-		while ((colIndex > 0) && (mainBoard[i][colIndex] != 32))
+		while ((colIndex > 0) && (mainBoard[i][colIndex][k] != 32))
 			colIndex--;
-		if (mainBoard[i][colIndex] == 32)
+		if (mainBoard[i][colIndex][k] == 32)
 			colIndex++;
 		int left = colIndex;
 
 		//count how many parts of the ship remain un-hit
 		int count = 0;
-		while ((colIndex < GameUtils::cols) && (mainBoard[i][colIndex] != 32))
-			if (mainBoard[i][colIndex++] != 'X')
+		while ((colIndex < cols) && (mainBoard[i][colIndex][k] != 32))
+			if (mainBoard[i][colIndex++][k] != 'X')
 				count++;
 
-		//if we have only one un-hit part, it was the initial part in (i,j), we erase the ship and return that it's a sink
+		//if we have only one un-hit part, it was the initial part in (i,j,k), we erase the ship and return that it's a sink
 		if (count == 1) {
 			colIndex = left;
-			while ((colIndex < GameUtils::cols) && (mainBoard[i][colIndex] != 32))
-				mainBoard[i][colIndex++] = 32;
+			while ((colIndex < cols) && (mainBoard[i][colIndex][k] != 32))
+				mainBoard[i][colIndex++][k] = 32;
 			return true;
 		}
-		//if it's not a sink we just update the (i,j) coordinate on the mainBoard as a hit and return it isn't a sink
-		mainBoard[i][j] = 'X';
+		//if it's not a sink we just update the (i,j,k) coordinate on the mainBoard as a hit and return it isn't a sink
+		mainBoard[i][j][k] = 'X';
+		return false;
+
+	}
+	//vertical
+	if (direction==1)
+	{
+		int rowIndex = i;
+		//find lower corner and save it in "lower"
+		while ((rowIndex > 0) && (mainBoard[rowIndex][j][k] != 32))
+			rowIndex--;	
+		if (mainBoard[rowIndex][j][k] == 32)
+			rowIndex++;
+		int lower = rowIndex;
+
+		//count how many parts of the ship remain un-hit
+		int count = 0;
+		while ((rowIndex < rows) && (mainBoard[rowIndex][j][k] != 32)) {
+			if (mainBoard[rowIndex][j][k] != 'X')
+				count++;
+			rowIndex++;
+		}
+
+		//if we have only one un-hit part and it was the initial part in (i,j,k), we erase the ship and return that it's a sink
+		if ((count == 1) && (mainBoard[i][j][k]!='X') && (mainBoard[i][j][k] != 32)) {
+			rowIndex = lower;
+			while ((rowIndex < rows) && (mainBoard[rowIndex][j][k] != 32))
+				mainBoard[rowIndex++][j][k] = 32;
+			return true;
+		}
+		//if it's not a sink we just update the (i,j,k) coordinate on the mainBoard as a hit and return it isn't a sink
+		mainBoard[i][j][k] = 'X';
 		return false;
 	}
+
+	//depth
+		int depthIndex = k;
+		//find deepest corner and save it in "deepest"
+		while ((depthIndex > 0) && (mainBoard[i][j][depthIndex] != 32))
+			depthIndex--;
+		if (mainBoard[i][j][depthIndex] == 32)
+			depthIndex++;
+		int deepest = depthIndex;
+
+		//count how many parts of the ship remain un-hit
+		int count = 0;
+		while ((depthIndex < depth) && (mainBoard[i][j][depth] != 32))
+			if (mainBoard[i][j][depthIndex++] != 'X')
+				count++;
+
+		//if we have only one un-hit part, it was the initial part in (i,j,k), we erase the ship and return that it's a sink
+		if (count == 1) {
+			depthIndex = deepest;
+			while ((depthIndex < depth) && (mainBoard[i][j][depthIndex] != 32))
+				mainBoard[i][j][depthIndex++] = 32;
+			return true;
+		}
+		//if it's not a sink we just update the (i,j,k) coordinate on the mainBoard as a hit and return it isn't a sink
+		mainBoard[i][j][k] = 'X';
+		return false;
+	}
+
+
+int BattleshipGame::shipDirection(int i, int j, int k) const {
+	//TODO-% is redundant?
+	//check horizontal
+	//if we are in a corner spot
+	if (j == 0)
+	{
+		if (mainBoard[i][1][k] != 32)
+			return 0;
+	}
+	else if (j == cols - 1)
+	{
+		if (mainBoard[i][cols - 2][k] != 32)
+			return 0;
+	}
+	//if we are not in a corner
+	else
+		if ((mainBoard[i][j - 1][k] != 32) || (mainBoard[i][j + 1][k] != 32))
+			return 0;
+	//not horizontal-check vertical
+	if (i == 0)
+	{
+		if (mainBoard[1][j][k] != 32)
+			return 1;
+	}
+	else if (i == rows - 1)
+	{
+		if (mainBoard[rows-2][j][k] != 32)
+			return 1;
+	}
+	//if we are not in a corner
+	else
+		if ((mainBoard[i-1][j][k] != 32) || (mainBoard[i+1][j][k] != 32))
+			return 1;
+	//not horizontal and not vertical
+	return 2;
+
+
+	/*
+	if (((j == 0) && ((mainBoard[i][1][k] == 32) || (mainBoard[i][1][k] == '%'))) || ((j == (cols - 1)) && ((mainBoard[i][cols - 2][k] == 32) || (mainBoard[i][cols - 2][k] == '%'))))
+		return 1;
+	if ((j == 0) || (j == (cols - 1)))
+		return 0;
+	if (((mainBoard[i][j - 1][k] == 32) || (mainBoard[i][j - 1][k] == '%')) && ((mainBoard[i][j + 1][k] == 32) || (mainBoard[i][j + 1][k] == '%')))
+		return 1;
+	return 0;*/
 }
-*/
 /*void BattleshipGame::printColorBoard(HANDLE* hConsole, int turnOf) const
 {
 	// printing the board frame:

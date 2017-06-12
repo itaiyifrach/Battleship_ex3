@@ -751,17 +751,6 @@ int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<p
 	return numOfPlayers;
 }
 
-//TODO-change function to support 3D board
-bool GameUtils::isVertical(char** board, int rows, int cols, int i, int j) {
-	if (((j == 0) && ((board[i][1] == 32) || (board[i][1] == '%'))) || ((j == (cols - 1)) && ((board[i][cols - 2] == 32) || (board[i][cols - 2] == '%'))))
-		return true;
-	if ((j == 0) || (j == (cols - 1)))
-		return false;
-	if (((board[i][j - 1] == 32) || (board[i][j - 1] == '%')) && ((board[i][j + 1] == 32) || (board[i][j + 1] == '%')))
-		return true;
-	return false;
-}
-
 int GameUtils::getScoreForSector(char boardSymbol) {
 	switch (boardSymbol) {
 	case 'b':
