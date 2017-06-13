@@ -48,7 +48,7 @@ public:
 	// Board Utils
 	static char3DArray allocateBoard(int rows, int cols, int depth);
 	
-	/*static char3DArray copyBoard(char3DArray& from,int rows, int cols, int depth);*/
+	static char3DArray copyBoard(char3DArray& from);
 
 	static vector<string> split(string str, char delimiter);
 

@@ -31,7 +31,7 @@ public:
 		rows = std::get<1>(board_tuple);
 		cols = std::get<2>(board_tuple);
 		depth = std::get<3>(board_tuple);		
-		mainBoard = GameUtils::copyBoard(std::get<0>(board_tuple), rows, cols, depth);
+		mainBoard = GameUtils::copyBoard(std::get<0>(board_tuple));
 		PlayerA = player_A.release();
 		PlayerB = player_B.release();
 		PlayerA->setPlayer(PLAYER_A_NUM);

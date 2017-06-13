@@ -6,7 +6,7 @@ class OurBoardData: public BoardData
 public:
 	OurBoardData(char3DArray& board, int rows, int cols, int depth,int playerNum): _rows(rows),_cols(cols),_depth(depth),_playerNum(playerNum)
 	{
-		_board=GameUtils::copyBoard(board, rows, cols, depth);
+		_board=GameUtils::copyBoard(board);
 	};
 	virtual ~OurBoardData() = default;
 	//returns only selected players' chars

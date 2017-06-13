@@ -48,24 +48,27 @@ char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 	return board;
 }
 
-/*char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
+char3DArray GameUtils::copyBoard(char3DArray& from)
 {
-	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
+	int rows = from.size();
+	int cols = from[0].size();
+	int depth = from[0][0].size();
+	
+	char3DArray board = vector<vector<vector<char>>>(rows);
 	for (int i = 0; i < rows; i++)
 	{
-		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
+		board[i] = vector<vector<char>>(cols);
 		for (int j = 0; j < cols; j++)
 		{
-			board[i][j] = make_unique<char[]>(depth);
+			board[i][j] = vector<char>(depth);
 			for (int k = 0; k < depth; k++)
 			{
-				board[i][j][k] =from[i][j][k];
+				board[i][j][k] = from[i][j][k];
 			}
 		}
 	}
 	return board;
-
-}*/
+}
 
 int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
