@@ -62,6 +62,9 @@
     <ClInclude Include="BattleshipGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CompetitionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -77,6 +80,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BattleshipGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompetitionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

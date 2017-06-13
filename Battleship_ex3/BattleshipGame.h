@@ -24,7 +24,7 @@ class BattleshipGame
 	
 
 public:
-	BattleshipGame(tuple<char3DArray, int, int, int, int> board_tuple,pair<unique_ptr<IBattleshipGameAlgo>, unique_ptr<IBattleshipGameAlgo>> player_pair)
+	BattleshipGame(tuple<char3DArray, int, int, int, int> board_tuple,unique_ptr<IBattleshipGameAlgo> player_A, unique_ptr<IBattleshipGameAlgo> player_B)
 	{
 		numOfShipsA = std::get<4>(board_tuple);
 		numOfShipsB = std::get<4>(board_tuple);
@@ -32,9 +32,16 @@ public:
 		cols = std::get<2>(board_tuple);
 		depth = std::get<3>(board_tuple);		
 		mainBoard = GameUtils::copyBoard(std::get<0>(board_tuple), rows, cols, depth);
-		PlayerA = player_pair.first.release();
-		PlayerB = player_pair.second.release();
-		playGame();
+		PlayerA = player_A.release();
+		PlayerB = player_B.release();
+		PlayerA->setPlayer(PLAYER_A_NUM);
+		PlayerB->setPlayer(PLAYER_B_NUM);
+		OurBoardData player_a_board_data;
+		player_a_board_data.setData(mainBoard, rows, cols, depth, PLAYER_A_NUM);
+		OurBoardData player_b_board_data;
+		player_a_board_data.setData(mainBoard, rows, cols, depth, PLAYER_B_NUM);
+		PlayerA->setBoard(player_a_board_data);
+		PlayerB->setBoard(player_b_board_data);
 
 	}
 
@@ -49,7 +56,7 @@ public:
 
 private:
 	// returns attack result of the attack in coor(i,j,k) and updates mainBoard using "updateBoardAndCheckSink"
-	std::pair<AttackResult, bool> getAttackResult(int i,int j,int k);
+	std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i, int j, int k) const;
 
 	//called by getAttackResult. Checks if the attack resulted by a sink and updates the mainBoard according to attack result:
 	//if it's a sink, erases the ship and returns true

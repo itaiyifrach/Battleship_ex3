@@ -11,7 +11,6 @@ public:
 	virtual ~OurBoardData() = default;
 	//returns only selected players' chars
 	virtual char charAt(Coordinate c) const override;
-
 protected:
 	int _rows = 0;
 	int _cols = 0; 

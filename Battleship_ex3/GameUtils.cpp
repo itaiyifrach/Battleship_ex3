@@ -32,13 +32,13 @@ void GameUtils::parseArgs(int argc, char** argv, string& basePath, int& numOfThr
 
 char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 {
-	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
+	char3DArray board = vector<vector<vector<char>>>(rows);
 	for (int i = 0; i < rows; i++)
 	{
-		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
+		board[i] = vector<vector<char>>(cols);
 		for (int j = 0; j < cols; j++)
 		{
-			board[i][j] = make_unique<char[]>(depth);
+			board[i][j] = vector<char>(depth);
 			for(int k = 0; k < depth; k++)
 			{
 				board[i][j][k] = ' ';
@@ -48,7 +48,7 @@ char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 	return board;
 }
 
-char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
+/*char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
 {
 	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
 	for (int i = 0; i < rows; i++)
@@ -65,7 +65,7 @@ char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int dept
 	}
 	return board;
 
-}
+}*/
 
 int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
@@ -120,14 +120,13 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	ifstream ifs(boardPath);
 	string line, token;
 	string delimiter = "x";
-	
 	// getting first line, which includes the dimentions of the board
 	getline(ifs, line);
 	std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 	vector<string> tokens = split(line, 'x');
 	if (tokens.size() != 3) {
 		// TODO: possible bonus here
-		return nullptr;
+		return char3DArray(0);
 	}
 	// by (COLS X ROWS X DEPTH)
 	istringstream firstStream(tokens[0]);
@@ -139,7 +138,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	if (firstStream.fail() || secondStream.fail() || thirdStream.fail() || rows<1  || cols<1 || depth<1)
 	{
 		// TODO: possible bonus here
-		return nullptr;
+		return char3DArray(0);
 	}	
 	
 	// memory allocation of the board, by (ROW X COLS X DEPTH)
@@ -172,9 +171,9 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 
 char2DArray GameUtils::getBoardCut(char3DArray& board, int rows, int cols, int depth, int cutBy)
 {
-	char2DArray boardCut = make_unique<unique_ptr<char[]>[]>(rows);
+	char2DArray boardCut = vector<vector<char>>(rows);
 	for (int i = 0; i < rows; i++) {
-		boardCut[i] = make_unique<char[]>(cols);
+		boardCut[i] = vector<char>(cols);
 	}
 
 	for (int i = 0; i < rows; i++) {
@@ -278,9 +277,9 @@ int GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int
  */
 void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mistakes, unique_ptr<int[]>& shipsTypeA, unique_ptr<int[]>& shipsTypeB)
 {
-	char2DArray markedBoard = make_unique<unique_ptr<char[]>[]>(rows);
+	char2DArray markedBoard = vector<vector<char>>(rows);
 	for (int i = 0; i < rows; i++) {
-		markedBoard[i] = make_unique<char[]>(cols);
+		markedBoard[i] = vector<char>(cols);
 	}
 	// copy board to markedBoard
 	for (int i = 0; i < rows; i++)
@@ -578,7 +577,7 @@ bool GameUtils::checkBound(char2DArray& board, char shipType, int i, int j, int*
 	return false;
 }
 
-void GameUtils::print1DBoard(unique_ptr<int[]>& board, int n)
+void GameUtils::print1DBoard(vector<char>& board, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -624,7 +623,7 @@ void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
 	cout << " " << endl;
 }
 
-int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<tuple<char3DArray,int,int,int,int>>& boards)
+int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<pair<char3DArray,int>>& boards)
 {
 	char shipMistakeTypeA, shipMistakeTypeB;
 	int numOfBoards = 0;
@@ -633,14 +632,14 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<t
 		// parsing the board to 3D char array	
 		int rows, cols, depth, numOfShips;
 		char3DArray board = parseBoard(path, boardNames[j], rows, cols, depth);
-		if (board != nullptr)	// parsing failed
+		if (board.size() != 0)	// parsing failed
 		{
 			// check if the board is valid
 			int mistakes[5] = { 0 };
 			numOfShips = checkBoard(board, rows, cols, depth, mistakes);
 			if (numOfShips != -1)
 			{				
-				boards.push_back(make_tuple(std::move(board),rows,cols,depth,numOfShips));
+				boards.push_back(make_pair(board,numOfShips));
 				numOfBoards++;				
 			}
 			// TODO: possible bonus here

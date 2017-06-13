@@ -36,8 +36,8 @@
 #define THREADS_DEFAULT 4
 
 using namespace std;
-typedef unique_ptr<unique_ptr<char[]>[]> char2DArray;
-typedef unique_ptr<unique_ptr<unique_ptr<char[]>[]>[]> char3DArray;
+typedef vector<vector<char>> char2DArray;
+typedef vector<vector<vector<char>>> char3DArray;
 
 class GameUtils
 {
@@ -47,9 +47,8 @@ public:
 
 	// Board Utils
 	static char3DArray allocateBoard(int rows, int cols, int depth);
-	static char3DArray copyBoard(char3DArray& from,int rows, int cols, int depth);
-
-
+	
+	/*static char3DArray copyBoard(char3DArray& from,int rows, int cols, int depth);*/
 
 	static vector<string> split(string str, char delimiter);
 
@@ -57,7 +56,7 @@ public:
 	static int parsePath(const string& basePath, vector<string>& boardNames);
 
 	//Loads all legal boards to vector
-	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<tuple<char3DArray, int, int, int, int>>& boards);
+	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<pair<char3DArray, int>>& boards);
 
 	//Parse board from .sboard file
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
@@ -82,7 +81,7 @@ public:
 	//Prints the board to console (for debug purposes)
 	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
 	static void print2DBoard(char2DArray& board, int rows, int cols);
-	static void print1DBoard(unique_ptr<int[]>& board, int n);	
+	static void print1DBoard(vector<char>& board, int n);
 
 	//returns the score-for-a-sink of a ship which is located in (i,j)th coordinate on mainBoard
 	static int getScoreForSector(char boardSymbol);

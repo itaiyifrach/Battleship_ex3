@@ -18,3 +18,4 @@ char OurBoardData::charAt(Coordinate c) const
 	}
 
 }
+

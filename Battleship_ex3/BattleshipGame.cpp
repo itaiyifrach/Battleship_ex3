@@ -6,12 +6,7 @@ void BattleshipGame::playGame() {
 	//0 iff its A's turn
 	int turnOf = 0;
 	bool endGame = false;
-	PlayerA->setPlayer(PLAYER_A_NUM);
-	PlayerB->setPlayer(PLAYER_B_NUM);
-	OurBoardData player_a_board_data(mainBoard, rows, cols, depth, PLAYER_A_NUM);
-	OurBoardData player_b_board_data(mainBoard, rows, cols, depth, PLAYER_B_NUM);
-	PlayerA->setBoard(player_a_board_data);
-	PlayerB->setBoard(player_b_board_data);
+
 	//initialize first attack (check if A/B have moves)
 	Coordinate currAttack = PlayerA->attack();
 	if (currAttack.row == -1)	
@@ -83,7 +78,7 @@ void BattleshipGame::playGame() {
 		getNextAttack(turnOf, endGame, currAttack);
 	}	// end of while
 
-
+	//TODO- return results instead of printing them
 	if ((numOfShipsA) && (!numOfShipsB))
 		cout << PLAYER_A_WON_STR << endl;
 	else if ((!numOfShipsA) && (numOfShipsB))
@@ -127,7 +122,7 @@ void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currA
 	}
 }
 
-std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k)  {
+std::pair<AttackResult, bool> BattleshipGame::getAttackResult(int i,int j,int k) const  {
 	std::pair<AttackResult, bool> result;
 	if (mainBoard[i][j][k] == 32) {
 		result.first = AttackResult::Miss;

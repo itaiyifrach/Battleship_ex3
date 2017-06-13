@@ -41,12 +41,8 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	BattleshipGame game1(boardVec[0], playersVec[0]);
-
-	//prepare all the games
-	
-
+	CompetitionManager competition(std::move(boardVec), dllNames, numOfThreads);
+	Competition.Start();
 
 	GameUtils::freeLibs(playersVec);
 	return 0;
