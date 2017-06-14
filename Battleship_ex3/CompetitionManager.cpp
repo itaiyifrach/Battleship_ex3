@@ -28,3 +28,14 @@ void CompetitionManager::printResults(int fixture) {
 bool percentCompare(playerData p1, playerData p2) { 
 	return ((p1.wins / p1.gamesPlayed) > (p2.wins / p2.gamesPlayed));
 }
+
+
+
+int CompetitionManager::findMinGames() const
+{
+	int minGames = INFINITY;
+	for (int i = 0; i < playerNames.size(); i++)
+		if (playersData[i].size() > minGames)
+			minGames = playersData[i].size();
+	return minGames;
+}

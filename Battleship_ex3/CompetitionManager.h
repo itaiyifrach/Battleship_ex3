@@ -31,7 +31,6 @@ public:
 
 private:
 	void printResults(int fixture);
-
-
+	int findMinGames() const;
 
 };
