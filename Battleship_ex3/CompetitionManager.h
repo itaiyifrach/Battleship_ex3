@@ -20,7 +20,6 @@ vector<vector<playerData>> playersData;
 
 class CompetitionManager
 {
-	vector<string> dllNames;
 	vector<pair<char3DArray, int>> boardVec;
 	vector<string> playerNames;
 	int numOfThreads;
