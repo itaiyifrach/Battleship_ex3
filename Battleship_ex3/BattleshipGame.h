@@ -11,8 +11,9 @@
 
 class BattleshipGame
 {
-	unique_ptr<IBattleshipGameAlgo, ? ? ? ? ? ? ? > PlayerA;
-	unique_ptr<IBattleshipGameAlgo, ? ? ? ? ? ? ? > PlayerB;
+
+	unique_ptr<IBattleshipGameAlgo> PlayerA;
+	unique_ptr<IBattleshipGameAlgo> PlayerB;
 	int numOfShipsA;
 	int numOfShipsB;
 	int rows;
@@ -21,10 +22,10 @@ class BattleshipGame
 	int scoreA = 0;
 	int scoreB = 0;
 	OurBoardData mainBoard;
-	
 
 public:
-	BattleshipGame(pair<char3DArray, int> board_tuple,unique_ptr<IBattleshipGameAlgo, ???????>& player_A, unique_ptr<IBattleshipGameAlgo, ? ? ? ? ? ? ? >& player_B)
+	BattleshipGame(pair<char3DArray, int>& board_tuple, IBattleshipGameAlgo* player_A, IBattleshipGameAlgo* player_B) :
+		PlayerA(player_A), PlayerB(player_B)
 	{
 		numOfShipsA = board_tuple.second;
 		numOfShipsB = board_tuple.second;
@@ -32,8 +33,6 @@ public:
 		cols = board_tuple.first[0].size();
 		depth = board_tuple.first[0][0].size();
 		mainBoard = OurBoardData(board_tuple.first, rows, cols, depth, GAME_MANAGER_NUM);		
-		PlayerA = std::move(player_A);
-		PlayerB = std::move(player_B);
 		PlayerA->setPlayer(PLAYER_A_NUM);
 		PlayerB->setPlayer(PLAYER_B_NUM);
 		PlayerA->setBoard(OurBoardData(board_tuple.first, rows, cols, depth, PLAYER_A_NUM));
@@ -41,6 +40,7 @@ public:
 	}
 
 	~BattleshipGame() = default;
+
 
 	//Main loop of the gameplay
 	tuple<int, int, int> BattleshipGame::playGame();

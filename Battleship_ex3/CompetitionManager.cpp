@@ -43,3 +43,62 @@ int CompetitionManager::findMinGames() const
 			minGames = playersData[i].size();
 	return minGames;
 }
+
+void CompetitionManager::threadWorker()
+{
+	while (true)
+	{
+		unique_lock<mutex> lock1(queueMutex);
+		lock1.lock();
+		tuple<int, int, int> currentGame = getGameTuple();
+		lock1.unlock;
+		if (get<0>(currentGame) == -1)
+		{
+			break;
+		}
+			
+		auto currBoard = boardVec[get<0>(currentGame)];
+		string filenameA = playerNames[get<1>(currentGame)];
+		string filenameB = playerNames[get<2>(currentGame)];
+		auto playerA= GameUtils::loadAlgo(path, filenameA);
+		auto playerB= GameUtils::loadAlgo(path, filenameB);
+		BattleshipGame game(currBoard,playerA.first,playerB.first);
+		tuple<int, int, int> gameResults = game.playGame();		
+		unique_lock<mutex> lock2(dataMutex);
+		lock2.lock();
+		updatePlayerData(gameResults);		
+		lock2.unlock;
+		result_printer.notify_one();
+		FreeLibrary(playerA.second);
+		FreeLibrary(playerB.second);
+	}
+	unique_lock<mutex> lock1(queueMutex);
+	lock1.lock();
+	cout << std::this_thread::get_id() << " this thread is done mate" << endl;
+	lock1.unlock();	
+}
+
+void CompetitionManager::dataRegistration()
+{
+	while (!finished) {
+		unique_lock<mutex> lock1(queueMutex);
+		int gap = numOfGames / PRINT_FREQ;
+		result_printer.wait(lock1, [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
+		printResults;
+	}
+}
+
+void CompetitionManager::launcher()
+{
+	vector<thread> threads;
+	initPairMaker playerComb(numOfPlayers,numOfBoards);
+	for (int i = 0; i < numOfThreads; i++)
+	{
+		threads.emplace_back(threadWorker,...);
+	}
+	threads.emplace_back(dataRegistration, ...);
+	for (thread& t : threads)
+	{
+		t.join();
+	}
+}
