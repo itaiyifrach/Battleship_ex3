@@ -26,7 +26,7 @@ class CompetitionManager
 
 public:
 	CompetitionManager(vector<string>& dllNames, vector<pair<char3DArray, int>>& boardVec, vector<string>& playerNames, int numOfThreads) :
-		dllNames(dllNames), boardVec(boardVec), playerNames(playerNames), numOfThreads(numOfThreads) {};
+		 boardVec(boardVec), playerNames(playerNames), numOfThreads(numOfThreads) {};
 
 private:
 	void printResults(int fixture);

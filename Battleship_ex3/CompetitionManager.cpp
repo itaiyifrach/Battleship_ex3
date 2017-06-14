@@ -21,7 +21,7 @@ void CompetitionManager::printResults(int fixture) {
 		string num = std::to_string(i + 1);
 		num = num + '.';
 		playerNum = results[i].first;
-		winsRatio = results[i].second.wins / (double)results[i].second.gamesPlayed;
+		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
 		cout << setw(8) << left << num << setw(24) << left << playerNames[playerNum] 
 			<< setw(8) << left << results[i].second.wins << setw(8) << left << results[i].second.losses 
 			<< setw(8) << left << winsRatio 
@@ -32,5 +32,14 @@ void CompetitionManager::printResults(int fixture) {
 }
 
 bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2) {
-	return ((p1.second.wins / (double) p1.second.gamesPlayed) > (p2.second.wins / (double) p2.second.gamesPlayed));
+	return ((p1.second.wins / double (p1.second.gamesPlayed)) > (p2.second.wins / double(p2.second.gamesPlayed)));
+}
+
+int CompetitionManager::findMinGames() const
+{
+	int minGames = INFINITY;
+	for (int i = 0; i < playerNames.size(); i++)
+		if (playersData[i].size() > minGames)
+			minGames = playersData[i].size();
+	return minGames;
 }
