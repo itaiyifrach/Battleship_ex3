@@ -74,6 +74,12 @@ private:
 
 	void searchForNextFirstHit(Coordinate att, AttackResult result);
 
+	void setMissAndRemoveCoordinate(const Coordinate& searchFor);
+
+	void removeCoordinateFromAttackList(const Coordinate& searchFor);
+
+	void moveCoordinateToBackOfAttackList(const Coordinate& searchFor);
+
 	//helper functions for dealing with the transition between attack states of the algorithm. Called from notifyOnMyAttackResult.
 	void searchForFirstHitTransition(Coordinate att, AttackResult result);
 

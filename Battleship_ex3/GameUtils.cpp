@@ -100,7 +100,7 @@ int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 			return -1;
 		}
 	}
-	sort(boardNames.begin(), boardNames.end());
+	
 	return 0;	
 }
 
@@ -681,11 +681,11 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 	return numOfBoards;
 }
 
-vector<string> GameUtils::getDLLNames(string& path)
+list<string> GameUtils::getDLLNames(string& path)
 {
 	HANDLE dir;
 	WIN32_FIND_DATAA fileData; //data struct for file
-	vector<string> fileNames;
+	list<string> fileNames;
 
 	// iterate over *.dll files in path	
 
@@ -706,12 +706,13 @@ vector<string> GameUtils::getDLLNames(string& path)
 		cout << MISSING_ALGO << path << endl;
 		return fileNames;
 	}
-	sort(fileNames.begin(), fileNames.end());
+	
 	return fileNames;
 
 }
 
-pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
+//assumes algo is valid
+pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
 {
 	
 	// define function of the type we expect
@@ -719,39 +720,57 @@ pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo (const stri
 	GetAlgoFuncType getAlgoFunc;
 	string algoPath = path + "\\" + fileName;
 	// Load dynamic library
-	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary
-	if (!hDll)
-	{		
-		return make_pair(nullptr, nullptr);
-	}
-	
+	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary	
 	// Get function pointer
-	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll,"GetAlgorithm"));
-	if (!getAlgoFunc)
-	{
-		FreeLibrary(hDll);		
-		return make_pair(nullptr, nullptr);
-	}	
-	pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> res(getAlgoFunc(), hDll);	
-	return res;
+	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll,"GetAlgorithm"));		
+	return make_pair(getAlgoFunc(), hDll);
 
 }
 
-int GameUtils::getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec)
+bool GameUtils::checkAlgo(const string& path, const string& fileName)
 {
-	int numOfPlayers = 0;
 
-	for(int i = 0; i < dllNames.size(); i++)
+	// define function of the type we expect
+	typedef IBattleshipGameAlgo *(*GetAlgoFuncType)();
+	GetAlgoFuncType getAlgoFunc;
+	string algoPath = path + "\\" + fileName;
+	// Load dynamic library
+	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary
+	if (!hDll)
 	{
-		auto player = loadAlgo(path, dllNames[i]);
-		if(player.first!=nullptr)
+		return false;
+	}
+
+	// Get function pointer
+	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll, "GetAlgorithm"));
+	if (!getAlgoFunc)
+	{
+		FreeLibrary(hDll);
+		return false;
+	}
+	FreeLibrary(hDll);
+	return true;
+
+}
+
+int GameUtils::checkPlayers(const string& path, list<string>& dllNames)
+{
+	int numOfLegalPlayers = 0;
+	//go over all the players and remove invalid players from the list
+	for (std::list<string>::const_iterator iterator = dllNames.begin(), end = dllNames.end(); iterator != end; ++iterator)
+	{
+		auto check = checkAlgo(path, *iterator);
+		if(check)
+		{			
+			numOfLegalPlayers++;
+		}
+		else
 		{
-			playersVec.push_back(std::move(player));
-			numOfPlayers++;
+			dllNames.erase(iterator);
 		}
 	}
 
-	return numOfPlayers;
+	return numOfLegalPlayers;
 }
 
 int GameUtils::getScoreForSector(char boardSymbol) {
@@ -879,6 +898,6 @@ bool GameUtils::isVertical(const OurBoardData& Board, const Coordinate& att) {
 	return false;
 }
 
-bool GameUtils::coordinatesComperator(const Coordinate& first, const Coordinate& second) const {
+bool GameUtils::coordinatesComparator(const Coordinate& first, const Coordinate& second) {
 	return ((first.row == second.row) && (first.col == second.col) && (first.depth == second.depth));
 }

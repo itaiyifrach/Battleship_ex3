@@ -9,25 +9,27 @@ struct playerData
 	int losses;
 	int pointsFor;
 	int pointsAgainst;
-	playerData() :wins(0), losses(0), pointsFor(0), pointsAgainst(0) {};
+	int gamesPlayed;
+	playerData() :wins(0), losses(0), pointsFor(0), pointsAgainst(0),gamesPlayed(0) {};
 
 };
-
+//global structure to hold players data results
 vector<vector<playerData>> playersData;
+//global queue of games
+
 class CompetitionManager
 {
 
 	vector<string> dllNames;
 	vector<pair<char3DArray, int>> boardVec;
-	unique_ptr<IBattleshipGameAlgo[]> players = nullptr;
+	vector<string> playerNames;
 	int numOfThreads;
 
-	CompetitionManager(vector<pair<char3DArray, int>> boardVec,
-		vector<string> dllNames, int numOfThreads) : dllNames(dllNames),boardVec(boardVec),numOfThreads(numOfThreads)
-	{
-		
+	CompetitionManager(vector<string>& dllNames, vector<pair<char3DArray, int>>& boardVec, vector<string>& playerNames, int numOfThreads) :
+		dllNames(dllNames), boardVec(boardVec), playerNames(playerNames), numOfThreads(numOfThreads) {};
 
-	}
+
+
 
 
 };

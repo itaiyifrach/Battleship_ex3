@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <list>
 #include <tuple>
 #include <windows.h>
 #include "IBattleshipGameAlgo.h"
@@ -64,13 +65,14 @@ public:
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
 
 	//finds all *.dll files of given path and returns a sorted vector of them
-	static vector<string> getDLLNames(string& path);
+	static list<string> getDLLNames(string& path);
 
-	//loads algorithm from dll.
-	static pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
+	//loads/checks algorithm from dll.
+	static bool GameUtils::checkAlgo(const string& path, const string& fileName);
+	static pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
 
 	//Loads all players to vector
-	static int getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
+	static int GameUtils::checkPlayers(const string& path, list<string>& dllNames);
 
 	//Check if the board is valid
 	static int checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
@@ -98,5 +100,5 @@ public:
 	static bool isHorizontal(const OurBoardData& Board, const Coordinate& att);
 	static bool isVertical(const OurBoardData& Board, const Coordinate& att);
 	
-	static bool coordinatesComperator(const Coordinate& first, const Coordinate& second) const;
+	static bool coordinatesComparator(const Coordinate& first, const Coordinate& second);
 };
