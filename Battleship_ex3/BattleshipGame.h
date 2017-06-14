@@ -24,27 +24,26 @@ class BattleshipGame
 	
 
 public:
-	BattleshipGame(tuple<char3DArray, int, int, int, int> board_tuple,unique_ptr<IBattleshipGameAlgo, ???????>& player_A, unique_ptr<IBattleshipGameAlgo, ? ? ? ? ? ? ? >& player_B)
+	BattleshipGame(pair<char3DArray, int> board_tuple,unique_ptr<IBattleshipGameAlgo, ???????>& player_A, unique_ptr<IBattleshipGameAlgo, ? ? ? ? ? ? ? >& player_B)
 	{
-		numOfShipsA = std::get<4>(board_tuple);
-		numOfShipsB = std::get<4>(board_tuple);
-		rows = std::get<1>(board_tuple);
-		cols = std::get<2>(board_tuple);
-		depth = std::get<3>(board_tuple);		
-		mainBoard = OurBoardData(std::get<0>(board_tuple), rows, cols, depth, GAME_MANAGER_NUM);
-		
+		numOfShipsA = board_tuple.second;
+		numOfShipsB = board_tuple.second;
+		rows = board_tuple.first.size();
+		cols = board_tuple.first[0].size();
+		depth = board_tuple.first[0][0].size();
+		mainBoard = OurBoardData(board_tuple.first, rows, cols, depth, GAME_MANAGER_NUM);		
 		PlayerA = std::move(player_A);
 		PlayerB = std::move(player_B);
 		PlayerA->setPlayer(PLAYER_A_NUM);
 		PlayerB->setPlayer(PLAYER_B_NUM);
-		PlayerA->setBoard(OurBoardData(std::get<0>(board_tuple), rows, cols, depth, PLAYER_A_NUM));
-		PlayerB->setBoard(OurBoardData(std::get<0>(board_tuple), rows, cols, depth, PLAYER_B_NUM));
+		PlayerA->setBoard(OurBoardData(board_tuple.first, rows, cols, depth, PLAYER_A_NUM));
+		PlayerB->setBoard(OurBoardData(board_tuple.first, rows, cols, depth, PLAYER_B_NUM));
 	}
 
 	~BattleshipGame() = default;
 
 	//Main loop of the gameplay
-	void playGame();
+	tuple<int, int, int> BattleshipGame::playGame();
 
 private:
 	// returns attack result of the attack in coor(i,j,k) and updates mainBoard using "updateBoardAndCheckSink"

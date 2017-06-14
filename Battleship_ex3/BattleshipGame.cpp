@@ -2,7 +2,7 @@
 #include "BattleshipGame.h"
 
 
-void BattleshipGame::playGame() {
+tuple<int,int,int> BattleshipGame::playGame() {
 	//0 iff its A's turn
 	int turnOf = 0;
 	bool endGame = false;
