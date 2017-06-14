@@ -1,5 +1,6 @@
 #pragma once
 #include "GameUtils.h"
+#include <iomanip>
 
 using namespace std;
 
@@ -19,16 +20,17 @@ vector<vector<playerData>> playersData;
 
 class CompetitionManager
 {
-
 	vector<string> dllNames;
 	vector<pair<char3DArray, int>> boardVec;
 	vector<string> playerNames;
 	int numOfThreads;
 
+public:
 	CompetitionManager(vector<string>& dllNames, vector<pair<char3DArray, int>>& boardVec, vector<string>& playerNames, int numOfThreads) :
 		dllNames(dllNames), boardVec(boardVec), playerNames(playerNames), numOfThreads(numOfThreads) {};
 
-
+private:
+	void printResults(int fixture);
 
 
 

@@ -4,7 +4,7 @@ void CompetitionManager::printResults(int fixture) {
 	// creating vector of 
 	vector<playerData> results;
 	for (int i = 0; playersData.size(); i++) {
-		results.push_back(playersData[1][fixture - 1]);
+		results.push_back(playersData[i][fixture - 1]);
 	}
 
 	// sorting by wins percentage
