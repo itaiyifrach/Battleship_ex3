@@ -31,7 +31,7 @@ void CompetitionManager::printResults(int fixture) {
 
 }
 
-bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2) {
+bool CompetitionManager::percentCompare(pair<int, playerData> p1, pair<int, playerData> p2) {
 	return ((p1.second.wins / double (p1.second.gamesPlayed)) > (p2.second.wins / double(p2.second.gamesPlayed)));
 }
 

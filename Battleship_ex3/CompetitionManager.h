@@ -30,6 +30,7 @@ public:
 
 private:
 	void printResults(int fixture);
+	static bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2);
 	int findMinGames() const;
 
 };
