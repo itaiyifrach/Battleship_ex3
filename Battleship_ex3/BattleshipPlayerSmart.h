@@ -1,5 +1,4 @@
-﻿/*
-#pragma once
+﻿#pragma once
 
 #include <algorithm>
 #include <ctime>
@@ -9,96 +8,92 @@
 #include "IBattleshipGameAlgo.h"
 #include <algorithm>
 #include "GameUtils.h"
+#include "OurBoardData.h"
 
 using namespace std;
 
 class BattleshipPlayerSmart : public IBattleshipGameAlgo
-{
-	int playerNum;
-	int cols;
-	int rows;
-	char** myBoard;
-	
-	list<pair<int, int>> attackMoves;
-	list<pair<int, int>> deceptionMoves;
-	int numOfDeceptionMoves;
-	bool isDecepting;
-
+{	
 	enum class AttackState {
 		searchForFirstHit,
-		afterFirstHitCheckHorizontalAttLeft,
-		afterFirstHitCheckHorizontalAttRight,
+		isHorizontalAttLeft,
+		isHorizontalAttRight,
 		foundHorizontalAttLeft,
 		foundHorizontalAttRight,
+		isVerticalAttUp,
+		isVerticalAttDown,
 		foundVerticalAttUp,
 		foundVerticalAttDown,
+		foundDepthAttInside,
+		foundDepthAttOutside,
 	};
 	AttackState state;
 
-	pair<int, int> nextAttack;
-	pair<int, int> rightmostHit;
-	pair<int, int> leftmostHit;
-	pair<int, int> upmostHit;
-	pair<int, int> downmostHit;
+	Coordinate nextAttack;
+	Coordinate rightmostHit;
+	Coordinate leftmostHit;
+	Coordinate upmostHit;
+	Coordinate downmostHit;
+	Coordinate inmostHit;
+	Coordinate outmostHit;
 
+	OurBoardData myBoard;
+	list<Coordinate> attackMoves;
+	int playerNum;
 public:
-	BattleshipPlayerSmart() : numOfDeceptionMoves(2), isDecepting(false), state(AttackState::searchForFirstHit), rightmostHit{ -1,-1 }, leftmostHit{ -1,-1 }, upmostHit{ -1,-1 }, downmostHit{ -1,-1 } {}
+	BattleshipPlayerSmart() : state(AttackState::searchForFirstHit),
+		nextAttack(-1, -1, -1), rightmostHit(-1, -1, -1),
+		leftmostHit(-1, -1, -1), upmostHit(-1, -1, -1),
+		downmostHit(-1, -1, -1), inmostHit(-1, -1, -1),
+		outmostHit(-1, -1, -1), playerNum(-1) {}
 
-	BattleshipPlayerSmart(const BattleshipPlayerSmart&) = delete;
-
-	BattleshipPlayerSmart& operator=(const BattleshipPlayerSmart&) = delete;
-
-	~BattleshipPlayerSmart() {
-		for (int i = 0; i < rows; i++)
-			delete myBoard[i];
-		delete[](myBoard);
+	virtual void setPlayer(int player) {
+		playerNum = player;
 	}
 
 	// called once to notify player on his myBoard
-	virtual void setBoard(int player, const char** mainBoard, int numRows, int numCols) override;
+	void setBoard(const BoardData& board) override;
 
 	// ask player for his move
-	virtual std::pair<int, int> attack() override;
+	Coordinate attack() override;
 
 	// notify on last move result
-	virtual void notifyOnAttackResult(int player, int row, int col, AttackResult result) override;
-
-	// called once to allow init from files if needed returns whether the init succeeded or failed
-	virtual bool init(const std::string& path) override
-	{
-		return true;
-	}
-
-
-
+	void notifyOnAttackResult(int player, Coordinate move, AttackResult result) override;
 
 private:
 	//generates a list with all possible attack moves after initializing players' board and stores
 	//it in "attackMoves" member with the following logic: first we look for ships large ships and we dscend to the smallest
-	list<pair<int, int>> BattleshipPlayerSmart::generateAllAttackMoves() const;
+	list<Coordinate> BattleshipPlayerSmart::generateAllAttackMoves() const;
 
 	//mark sinked ship and its perimiter on board and erase the relevant moves from the attackMoves list
-	void markSinkedShipAndUpdateAttacks(int i, int j);
+	void markSinkedShipAndUpdateAttacks(Coordinate att);
 
-	void notifyOnMyAttackResult(int row, int col, AttackResult result);
+	void notifyOnMyAttackResult(Coordinate att, AttackResult result);
 
-	void notifyOnOpponentsAttackResult(int row, int col, AttackResult result);
+	void notifyOnOpponentsAttackResult(Coordinate att, AttackResult result);
 
-	void searchForNextFirstHit(int row, int col, AttackResult result);
+	void searchForNextFirstHit(Coordinate att, AttackResult result);
 
 	//helper functions for dealing with the transition between attack states of the algorithm. Called from notifyOnMyAttackResult.
-	void searchForFirstHitTransition(int row, int col, AttackResult result);
+	void searchForFirstHitTransition(Coordinate att, AttackResult result);
 
-	void afterFirstHitCheckHorizontalAttLeftTransition(int row, int col, AttackResult result);
+	void checkHorizontalAttLeftTransition(Coordinate att, AttackResult result);
 
-	void afterFirstHitCheckHorizontalAttRightTransition(int row, int col, AttackResult result);
+	void checkHorizontalAttRightTransition(Coordinate att, AttackResult result);
 
-	void foundHorizontalAttLeftTransition(int row, int col, AttackResult result);
+	void foundHorizontalAttLeftTransition(Coordinate att, AttackResult result);
 
-	void foundHorizontalAttRightTransition(int row, int col, AttackResult result);
+	void foundHorizontalAttRightTransition(Coordinate att, AttackResult result);
 
-	void foundVerticalAttUpTransition(int row, int col, AttackResult result);
+	void checkVerticalAttUpTransition(Coordinate att, AttackResult result);
+
+	void checkVerticalAttDownTransition(Coordinate att, AttackResult result);
+
+	void foundVerticalAttUpTransition(Coordinate att, AttackResult result);
 	
-	void foundVerticalAttDownTransition(int row, int col, AttackResult result);
+	void foundVerticalAttDownTransition(Coordinate att, AttackResult result);
+
+	void foundDepthAttInsideTransition(Coordinate att, AttackResult result);
+	
+	void foundDepthAttOutsideTransition(Coordinate att, AttackResult result);
 };
-*/

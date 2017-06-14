@@ -11,10 +11,12 @@
 #include <tuple>
 #include <windows.h>
 #include "IBattleshipGameAlgo.h"
+#include "OurBoardData.h"
 #include <memory>
 
 #define PLAYER_A_NUM 0
 #define PLAYER_B_NUM 1
+#define GAME_MANAGER_NUM 10
 #define SIZE_SHIP_B 1
 #define SIZE_SHIP_P 2
 #define SIZE_SHIP_M 3
@@ -47,8 +49,8 @@ public:
 
 	// Board Utils
 	static char3DArray allocateBoard(int rows, int cols, int depth);
-	
-	static char3DArray copyBoard(char3DArray& from);
+
+	/*static char3DArray copyBoard(char3DArray& from,int rows, int cols, int depth);*/
 
 	static vector<string> split(string str, char delimiter);
 
@@ -62,10 +64,10 @@ public:
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
 
 	//finds all *.dll files of given path and returns a sorted vector of them
-	static vector<string> getDLLNames(string& path);	
+	static vector<string> getDLLNames(string& path);
 
 	//loads algorithm from dll.
-	static pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);	
+	static pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
 
 	//Loads all players to vector
 	static int getPlayers(const string& path, vector<string>& dllNames, vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
@@ -90,4 +92,11 @@ public:
 
 	//free all dll libs
 	static void freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
+
+	// Check the direction of the ship in "att" coordinate on "Board". return 0 if horizontal, 1 if vertical, 2 if into deep
+	static int shipDirection(const OurBoardData& Board, const Coordinate& att);
+	static bool isHorizontal(const OurBoardData& Board, const Coordinate& att);
+	static bool isVertical(const OurBoardData& Board, const Coordinate& att);
+	
+	static bool coordinatesComperator(const Coordinate& first, const Coordinate& second) const;
 };

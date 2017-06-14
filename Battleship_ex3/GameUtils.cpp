@@ -48,27 +48,24 @@ char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 	return board;
 }
 
-char3DArray GameUtils::copyBoard(char3DArray& from)
+/*char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
 {
-	int rows = from.size();
-	int cols = from[0].size();
-	int depth = from[0][0].size();
-	
-	char3DArray board = vector<vector<vector<char>>>(rows);
+	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
 	for (int i = 0; i < rows; i++)
 	{
-		board[i] = vector<vector<char>>(cols);
+		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
 		for (int j = 0; j < cols; j++)
 		{
-			board[i][j] = vector<char>(depth);
+			board[i][j] = make_unique<char[]>(depth);
 			for (int k = 0; k < depth; k++)
 			{
-				board[i][j][k] = from[i][j][k];
+				board[i][j][k] =from[i][j][k];
 			}
 		}
 	}
 	return board;
-}
+
+}*/
 
 int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
@@ -805,4 +802,83 @@ void GameUtils::freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>
 {
 	for (int i = 0; i < playersVec.size(); i++)
 		FreeLibrary(playersVec[i].second);
+}
+
+
+int GameUtils::shipDirection(const OurBoardData& Board, const Coordinate& att) {
+	if (isHorizontal(Board, att)) {
+		return 0;
+	}
+	else if (isVertical(Board, att)) {
+		return 1;
+	}
+	else {
+		return 2;
+	}
+}
+
+
+bool GameUtils::isHorizontal(const OurBoardData& Board, const Coordinate& att) {
+	if (att.col == 1)
+	{
+		if ((Board.charAt(Coordinate(att.row, 2, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row, 2, att.depth)) != '%')) 
+		{
+			return true;
+		}
+	}
+	else if (att.col == Board.cols())
+	{
+		if ((Board.charAt(Coordinate(att.row, Board.cols() - 1, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row, Board.cols() - 1, att.depth)) != '%'))
+		{
+			return true;
+		}
+	}
+	//if we are not on the borders
+	else {
+		if (((Board.charAt(Coordinate(att.row, att.col - 1, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row, att.col - 1, att.depth)) != '%')) ||
+			((Board.charAt(Coordinate(att.row, att.col + 1, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row, att.col + 1, att.depth)) != '%')))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool GameUtils::isVertical(const OurBoardData& Board, const Coordinate& att) {
+	if (att.row == 1)
+	{
+		if ((Board.charAt(Coordinate(2, att.col, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(2, att.col, att.depth)) != '%'))
+		{
+			return true;
+		}
+	}
+	else if (att.col == Board.cols())
+	{
+		if ((Board.charAt(Coordinate(Board.rows() - 1, att.col, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(Board.rows() - 1, att.col, att.depth)) != '%'))
+		{
+			return true;
+		}
+	}
+	//if we are not on the borders
+	else {
+		if (((Board.charAt(Coordinate(att.row - 1, att.col, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row - 1, att.col, att.depth)) != '%')) ||
+			((Board.charAt(Coordinate(att.row + 1, att.col, att.depth)) != 32) &&
+			(Board.charAt(Coordinate(att.row + 1, att.col, att.depth)) != '%')))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool GameUtils::coordinatesComperator(const Coordinate& first, const Coordinate& second) const {
+	return ((first.row == second.row) && (first.col == second.col) && (first.depth == second.depth));
 }
