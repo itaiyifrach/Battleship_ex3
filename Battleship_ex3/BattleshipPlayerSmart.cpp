@@ -114,10 +114,9 @@ list<Coordinate> BattleshipPlayerSmart::generateAllAttackMoves() const
 		{
 			for (int k = 1; k <= myBoard.depth(); ++k)
 			{
-				Coordinate curr(i, j, k);
-				if (myBoard.charAt(curr) != 32)
+				if (myBoard.charAt(Coordinate(i, j, k)) != 32)
 				{
-					MovesVec.emplace_back(curr);
+					MovesVec.emplace_back(i, j, k);
 				}
 			}
 		}
@@ -151,8 +150,23 @@ void BattleshipPlayerSmart::searchForNextFirstHit(Coordinate att, AttackResult r
 	}
 }
 
-//refactor all remove from attacklist (use find to dind approptiate iterator and remove it)***************************************************
-//finish refactoring - from line175
+void BattleshipPlayerSmart::setMissAndRemoveCoordinate(const Coordinate& searchFor) {
+	myBoard.setMiss(searchFor);
+	removeCoordinateFromAttackList(searchFor);
+}
+
+void BattleshipPlayerSmart::removeCoordinateFromAttackList(const Coordinate& searchFor) {
+	auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
+		return GameUtils::coordinatesComparator(searchFor, coor); });
+	if (itr != attackMoves.end()) {
+		attackMoves.erase(itr);
+	}
+}
+
+void BattleshipPlayerSmart::moveCoordinateToBackOfAttackList(const Coordinate& searchFor) {
+	removeCoordinateFromAttackList(searchFor);
+	attackMoves.emplace_back(searchFor.row, searchFor.col, searchFor.depth);
+}
 
 void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 	int direction = GameUtils::shipDirection(myBoard, att);
@@ -160,7 +174,7 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 		//find left corner
 		int colIndex = att.col;
 		//find left corner and save it in "left"
-		while ((colIndex > 0) && 
+		while ((colIndex > 1) && 
 			(myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32) &&
 			(myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != '%')) {
 			colIndex--;
@@ -170,65 +184,126 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 		{
 			colIndex++;
 		}
-		if (colIndex > 0)
+		if (colIndex > 1)
 		{
-			myBoard.setMiss(Coordinate(att.row, colIndex - 1, att.depth));
-			attackMoves.remove(Coordinate(att.row, colIndex - 1, att.depth));
+			setMissAndRemoveCoordinate(Coordinate(att.row, colIndex - 1, att.depth));
+			
 		}
-		while ((j < myBoard.cols()) && (myBoard[i][j] != 32) && (myBoard[i][j] != '%'))
+		while ((colIndex < myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32) &&
+			(myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != '%'))
 		{
-			if (i > 0)
+			if (att.row > 1)
 			{
-				myBoard[i - 1][j] = '%';
-				attackMoves.remove(Coordinate{ i, j + 1 });
+				setMissAndRemoveCoordinate(Coordinate(att.row - 1, colIndex, att.depth));
 			}
-			if (i < (myBoard.rows() - 1))
+			if (att.row < myBoard.rows())
 			{
-				myBoard[i + 1][j] = '%';
-				attackMoves.remove(Coordinate{ i + 2, j + 1 });
+				setMissAndRemoveCoordinate(Coordinate(att.row + 1, colIndex, att.depth));
 			}
-			++j;
+			if (att.depth > 1)
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row, colIndex, att.depth - 1));
+			}
+			if (att.depth < myBoard.depth())
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row, colIndex, att.depth + 1));
+			}
+			++colIndex;
 		}
-		j--;
-		if (j < (myBoard.cols() - 1))
+		colIndex--;
+		if (colIndex < myBoard.cols())
 		{
-			myBoard[i][j + 1] = '%';
-			attackMoves.remove(Coordinate{ i + 1, j + 2 });
+			setMissAndRemoveCoordinate(Coordinate(att.row, colIndex + 1, att.depth));
 		}
 	} 
 	else if (direction == 1) { // erasure of all perimiter cells and moves - vertical ship
 		//find upper corner
-		while ((i > 0) && (myBoard[i][j] != 32) && (myBoard[i][j] != '%')) { i--; }
-		if ((myBoard[i][j] == 32) || (myBoard[i][j] == '%'))
-		{
-			i++;
-		} if (i > 0) {
-			myBoard[i-1][j] = '%';
-			attackMoves.remove(Coordinate { i, j + 1 });
-				
+		int rowIndex = att.row;
+		//find left corner and save it in "left"
+		while ((rowIndex > 1) &&
+			(myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32) &&
+			(myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != '%')) {
+			rowIndex--;
 		}
-		while ((i < myBoard.rows()) && (myBoard[i][j] != 32) && (myBoard[i][j] != '%'))
+		if ((myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) == 32) ||
+			(myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) == '%'))
 		{
-			if (j > 0)
-			{
-				myBoard[i][j - 1] = '%';
-				attackMoves.remove(Coordinate { i + 1, j });
-			}
-			if (j < (myBoard.cols()-1))
-			{
-				myBoard[i][j + 1] = '%';
-				attackMoves.remove(Coordinate { i + 1, j + 2 });
-			}
-			++i;
+			rowIndex++;
 		}
-		i--;
-		if (i < (myBoard.rows()-1))
+		if (rowIndex > 1)
 		{
-			myBoard[i+1][j] = '%';
-			attackMoves.remove(Coordinate { i + 2, j + 1});
+			setMissAndRemoveCoordinate(Coordinate(rowIndex - 1, att.col, att.depth));
+		}
+		while ((rowIndex < myBoard.rows()) && (myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32) &&
+			(myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != '%'))
+		{
+			if (att.col > 1)
+			{
+				setMissAndRemoveCoordinate(Coordinate(rowIndex, att.col - 1, att.depth));
+			}
+			if (att.col < myBoard.cols())
+			{
+				setMissAndRemoveCoordinate(Coordinate(rowIndex, att.col + 1, att.depth));
+			}
+			if (att.depth > 1)
+			{
+				setMissAndRemoveCoordinate(Coordinate(rowIndex, att.col, att.depth - 1));
+			}
+			if (att.depth < myBoard.depth())
+			{
+				setMissAndRemoveCoordinate(Coordinate(rowIndex, att.col, att.depth + 1));
+			}
+			++rowIndex;
+		}
+		rowIndex--;
+		if (rowIndex < myBoard.rows())
+		{
+			setMissAndRemoveCoordinate(Coordinate(rowIndex + 1, att.col, att.depth));
 		}
 	} else { // erasure of all perimiter cells and moves - depth sheep
-		
+		//find inner corner
+		int depthIndex = att.depth;
+		//find left corner and save it in "left"
+		while ((depthIndex > 1) &&
+			(myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32) &&
+			(myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != '%')) {
+			depthIndex--;
+		}
+		if ((myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) == 32) ||
+			(myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) == '%'))
+		{
+			depthIndex++;
+		}
+		if (depthIndex > 1)
+		{
+			setMissAndRemoveCoordinate(Coordinate(att.row, att.col, depthIndex - 1));
+		}
+		while ((depthIndex < myBoard.depth()) && (myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32) &&
+			(myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != '%'))
+		{
+			if (att.row > 1)
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row - 1, att.col, depthIndex));
+			}
+			if (att.row < myBoard.rows())
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row + 1, att.col, depthIndex));
+			}
+			if (att.col > 1)
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row, att.col - 1, depthIndex));
+			}
+			if (att.col < myBoard.cols())
+			{
+				setMissAndRemoveCoordinate(Coordinate(att.row, att.col + 1, depthIndex));
+			}
+			++depthIndex;
+		}
+		depthIndex--;
+		if (depthIndex < myBoard.depth())
+		{
+			setMissAndRemoveCoordinate(Coordinate(att.row, att.col, depthIndex + 1));
+		}
 	}
 }
 
@@ -237,7 +312,7 @@ Coordinate BattleshipPlayerSmart::attack() {
 	{
 		nextAttack = Coordinate(-1,-1,-1);
 	}
-	else if (GameUtils::coordinatesComperator(nextAttack,attackMoves.back()))
+	else if (GameUtils::coordinatesComparator(nextAttack,attackMoves.back()))
 	{
 		attackMoves.pop_back();
 	}
@@ -245,9 +320,9 @@ Coordinate BattleshipPlayerSmart::attack() {
 	{
 		Coordinate searchFor(nextAttack.row, nextAttack.col, nextAttack.depth);
 		if (find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-																return GameUtils::coordinatesComperator(searchFor, coor); }) != attackMoves.end())
+																return GameUtils::coordinatesComparator(searchFor, coor); }) != attackMoves.end())
 		{
-			attackMoves.remove(nextAttack);
+			removeCoordinateFromAttackList(nextAttack);
 		}
 		else
 		{
@@ -716,7 +791,7 @@ void BattleshipPlayerSmart::foundDepthAttOutsideTransition(Coordinate att, Attac
 void BattleshipPlayerSmart::notifyOnOpponentsAttackResult(Coordinate att, AttackResult result)
 {
 	//delete the relevant coordinate from the attack options! and only this cell. leave the perimiter (in case we are being decepted)
-	attackMoves.remove(att);
+	removeCoordinateFromAttackList(att);
 
 	if (result == AttackResult::Miss) {
 		myBoard.setMiss(att);
@@ -725,82 +800,29 @@ void BattleshipPlayerSmart::notifyOnOpponentsAttackResult(Coordinate att, Attack
 		myBoard.setHit(att);
 		
 		//set next attack from attackMoves (not nextAttack variable)
-		if ((att.col > 1) && (myBoard.charAt(Coordinate(att.row, att.col - 1, att.depth)) == 32)) //set next attack to the left of the first hit
-		{		
-			Coordinate searchFor(att.row, att.col - 1, att.depth);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row, att.col - 1, att.depth);
-			}
-			
+		if ((att.col > 1) && (myBoard.charAt(Coordinate(att.row, att.col - 1, att.depth)) == 32)){ //set next attack to the left of the first hit		
+			moveCoordinateToBackOfAttackList(Coordinate(att.row, att.col - 1, att.depth));			
 		}
-		if ((att.col < myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, att.col + 1, att.depth)) == 32)) //set next attack to the right of the first hit
-		{
-			Coordinate searchFor(att.row, att.col + 1, att.depth);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row, att.col + 1, att.depth);
-			}
+		if ((att.col < myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, att.col + 1, att.depth)) == 32)){ //set next attack to the right of the first hit
+			moveCoordinateToBackOfAttackList(Coordinate(att.row, att.col + 1, att.depth));
 		}
-		if ((att.row > 1) && (myBoard.charAt(Coordinate(att.row - 1, att.col, att.depth)) == 32)) //set next attack up to the first hit
-		{
-			Coordinate searchFor(att.row - 1, att.col, att.depth);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			//emplace (row - 1,col) as the next attack in our list (if it was not deleted and legal)
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row - 1, att.col, att.depth);
-			}
+		if ((att.row > 1) && (myBoard.charAt(Coordinate(att.row - 1, att.col, att.depth)) == 32)){ //set next attack up to the first hit
+			moveCoordinateToBackOfAttackList(Coordinate(att.row - 1, att.col, att.depth));
 		}
-		if ((att.row < myBoard.rows()) && (myBoard.charAt(Coordinate(att.row + 1,att.col, att.depth)) == 32)) //set next attack down to the first hit
-		{
-			Coordinate searchFor(att.row + 1, att.col, att.depth);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			//emplace (row - 1,col) as the next attack in our list (if it was not deleted and legal)
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row + 1, att.col, att.depth);
-			}
+		if ((att.row < myBoard.rows()) && (myBoard.charAt(Coordinate(att.row + 1,att.col, att.depth)) == 32)){ //set next attack down to the first hit
+			moveCoordinateToBackOfAttackList(Coordinate(att.row + 1, att.col, att.depth));
 		}
-		if ((att.depth > 1) && (myBoard.charAt(Coordinate(att.row, att.col, att.depth - 1)) == 32)) //set next attack down to the first hit
-		{
-			Coordinate searchFor(att.row, att.col, att.depth - 1);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			//emplace (row - 1,col) as the next attack in our list (if it was not deleted and legal)
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row, att.col, att.depth - 1);
-			}
+		if ((att.depth > 1) && (myBoard.charAt(Coordinate(att.row, att.col, att.depth - 1)) == 32)){ //set next attack down to the first hit
+			moveCoordinateToBackOfAttackList(Coordinate(att.row, att.col, att.depth - 1));
 		}
-		if ((att.depth < myBoard.depth()) && (myBoard.charAt(Coordinate(att.row, att.col, att.depth + 1)) == 32)) //set next attack down to the first hit
-		{
-			Coordinate searchFor(att.row, att.col, att.depth + 1);
-			auto itr = find_if(attackMoves.begin(), attackMoves.end(), [&searchFor](const Coordinate& coor) {
-				return GameUtils::coordinatesComperator(searchFor, coor); });
-			//emplace (row - 1,col) as the next attack in our list (if it was not deleted and legal)
-			if (itr != attackMoves.end())
-			{
-				attackMoves.erase(itr);
-				attackMoves.emplace_back(att.row, att.col, att.depth + 1);
-			}
+		if ((att.depth < myBoard.depth()) && (myBoard.charAt(Coordinate(att.row, att.col, att.depth + 1)) == 32)){ //set next attack down to the first hit
+			moveCoordinateToBackOfAttackList(Coordinate(att.row, att.col, att.depth + 1));
 		}
 	}
 	else if ((result == AttackResult::Sink) && (myBoard.charAt(att) == 32))
 	{
 		myBoard.setHit(att);
-		if (GameUtils::coordinatesComperator(nextAttack,att))
+		if (GameUtils::coordinatesComparator(nextAttack,att))
 		{
 			searchForNextFirstHit(att , result);
 		}

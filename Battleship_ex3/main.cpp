@@ -5,8 +5,7 @@ int main(int argc, char** argv)
 {
 	string basePath;
 	vector<string> boardNames;
-	vector<tuple<char3DArray,int,int,int,int>> boardVec;
-	vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>> playersVec;
+	vector<pair<char3DArray,int>> boardVec;	
 	int numOfBoards = 0, numOfPlayers = 0, numOfGames = 0, numOfThreads = THREADS_DEFAULT;
 	
 	GameUtils::parseArgs(argc, argv, basePath, numOfThreads);
@@ -18,7 +17,7 @@ int main(int argc, char** argv)
 	}
 	
 	//creates a vector of all *.dll files in the given path
-	vector<string> dllNames = GameUtils::getDLLNames(basePath);
+	list<string> dllNames = GameUtils::getDLLNames(basePath);
 	//check if number of dll's/boards is invalid (errors printed inside functions)
 	if (dllNames.size() < 2 || check == -1)
 	{
@@ -28,22 +27,20 @@ int main(int argc, char** argv)
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
 	//cout << "# of Valid BOARDS = " << numOfBoards << endl;
 	
-	//loads all dll's
-	numOfPlayers = GameUtils::getPlayers(basePath,dllNames,playersVec);
+	//
+	numOfPlayers = GameUtils::checkPlayers(basePath,dllNames);
 	//print number of legal players and boards
 	cout << LEGAL_PLAYERS << numOfPlayers << endl;
 	cout << LEGAL_BOARDS << numOfBoards << endl;
 
 	if (numOfBoards < 1 || numOfPlayers < 2)
 	{
-		cout << NOT_ENOUGH_LEGAL << endl;
-		GameUtils::freeLibs(playersVec);
+		cout << NOT_ENOUGH_LEGAL << endl;		
 		return -1;
 	}
 
-	CompetitionManager competition(std::move(boardVec), dllNames, numOfThreads);
-	Competition.Start();
-
-	GameUtils::freeLibs(playersVec);
+	//CompetitionManager competition(std::move(boardVec), dllNames, numOfThreads);
+	//Competition.Start();
+	
 	return 0;
 }

@@ -149,7 +149,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 	{
 		int colIndex = att.col;
 		//find left corner and save it in "left"
-		while ((colIndex > 0) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32)) {
+		while ((colIndex > 1) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32)) {
 			colIndex--;
 		}
 		if (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) == 32) {
@@ -183,7 +183,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 	{
 		int rowIndex = att.row;
 		//find lower corner and save it in "lower"
-		while ((rowIndex > 0) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
+		while ((rowIndex > 1) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
 			rowIndex--;
 		}
 		if (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) == 32) {
@@ -215,7 +215,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 		//depth
 		int depthIndex = att.depth;
 		//find deepest corner and save it in "deepest"
-		while ((depthIndex > 0) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
+		while ((depthIndex > 1) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
 			depthIndex--;
 		}
 		if (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) == 32) {
