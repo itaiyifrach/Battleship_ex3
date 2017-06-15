@@ -15,7 +15,7 @@ deque<pair<int, int>> PlayerComb::buildQueue(int playerNum, int numOfPlayers)
 
 tuple<int, int, int> PlayerComb::getGameParams()
 {	
-	if (isEmpty)
+	if (finished)
 		return make_tuple(-1, -1, -1);
 	int prevIndex = currentIndex;
 	do
@@ -30,8 +30,7 @@ tuple<int, int, int> PlayerComb::getGameParams()
 				++params.second;
 				gamesQueue[currentIndex].push_back(params);
 			}
-				
-			++numOfExtractedGames;			
+							
 			currentIndex = (currentIndex + 1)% numOfPlayers;
 			return game_tuple;
 		}
@@ -40,13 +39,8 @@ tuple<int, int, int> PlayerComb::getGameParams()
 
 	} while (currentIndex != prevIndex);
 	//if we checked every queue and they are all empty- then there are no more games left (isEmpty should be enough, this is for assurance)
+	finished = true;
 	return make_tuple(-1, -1, -1);
 	
 	
-}
-
-bool PlayerComb::isEmpty() const
-{
-	return numOfExtractedGames == numOfGames;
-
 }

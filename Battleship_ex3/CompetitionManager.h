@@ -23,16 +23,19 @@ struct playerData
 };
 //global structure to hold players data results
 vector<vector<playerData>> playersData;
-//global queue of games
-
-//global mutex
+//global mutexs
 mutex printerMutex;
 mutex queueMutex;
 mutex dataMutex;
 mutex debugMutex;
+//condition variable for printer
 condition_variable result_printer;
+//atomic vars for the printing
 atomic<int> ourLastPrintNumOfGames = 0;
 atomic<int> currentNumOfGames = 0;
+//global var from PlayerComb.h
+extern bool finished;
+
 
 class CompetitionManager
 {
@@ -41,24 +44,23 @@ class CompetitionManager
 public:
 	CompetitionManager( vector<pair<char3DArray, int>>& boardVec,list<string>& playerNames,string path, int numOfBoards,int numOfPlayers,int numOfGames, int numOfThreads) :
 		 boardVec(boardVec), playerNames(playerNames.begin(), playerNames.end()), path(path),
-		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(numOfThreads) {};
-	void threadWorker(PlayerComb& playerComb);	
-	void launcher();
+		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(min(numOfThreads,numOfGames)) {};
+	static void threadWorker(CompetitionManager& competition, PlayerComb& gamesQueue);
+	static void launcher(CompetitionManager& competition);
 
 private:
-	vector<pair<char3DArray, int>> boardVec;
-	vector<string> playerNames;
+	const vector<pair<char3DArray, int>> boardVec;
+	const vector<string> playerNames;
 	const string path;
 	const int numOfBoards;
 	const int numOfPlayers;
 	const int numOfGames;
-	const int numOfThreads;		
-	bool finished = false;
+	const int numOfThreads;	
 
 	//helper functions
-	void CompetitionManager::printResults();
+	static void printResults(CompetitionManager& competition);
 	static bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2);
-	int findMinGames() const;
-	static void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB);
+	static int findMinGames();
+	static void updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB);
 	
 };

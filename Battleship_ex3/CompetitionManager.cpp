@@ -1,6 +1,6 @@
 #include "CompetitionManager.h"
 
-void CompetitionManager::printResults() {
+void CompetitionManager::printResults(CompetitionManager& competition) {
 	// creating vector of results
 	int fixture = findMinGames();
 	if (fixture == 0)
@@ -26,7 +26,7 @@ void CompetitionManager::printResults() {
 		playerNum = results[i].first;
 		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
 		//TODO- PRINT ONLY 1 DECIMAL DIGIT
-		cout << setw(8) << left << num << setw(24) << left << playerNames[playerNum] 
+		cout << setw(8) << left << num << setw(24) << left << competition.playerNames[playerNum] 
 			<< setw(8) << left << results[i].second.wins << setw(8) << left << results[i].second.losses 
 			<< setw(8) << left << winsRatio 
 			<< setw(8) << left << results[i].second.pointsFor << setw(12) << left << results[i].second.pointsAgainst;
@@ -39,22 +39,22 @@ bool CompetitionManager::percentCompare(pair<int, playerData> p1, pair<int, play
 	return ((p1.second.wins / double (p1.second.gamesPlayed)) > (p2.second.wins / double(p2.second.gamesPlayed)));
 }
 
-int CompetitionManager::findMinGames() const
+int CompetitionManager::findMinGames()
 {
 	int minGames = INFINITY;
-	for (int i = 0; i < playerNames.size(); i++)
+	for (int i = 0; i < playersData.size(); i++)
 		if (playersData[i].size() > minGames)
 			minGames = playersData[i].size();
 	return minGames;
 }
 
-void CompetitionManager::threadWorker(PlayerComb& playerComb)
+void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerComb& gamesQueue)
 {
-	while (true)
+	while (!finished)
 	{
 		unique_lock<mutex> lock1(queueMutex);
 		lock1.lock();
-		tuple<int, int, int> currentGame = playerComb.getGameParams();
+		tuple<int, int, int> currentGame = gamesQueue.getGameParams();
 		lock1.unlock;
 		if (get<0>(currentGame) == -1)
 		{
@@ -64,11 +64,11 @@ void CompetitionManager::threadWorker(PlayerComb& playerComb)
 		auto boardIndex = get<0>(currentGame);
 		auto playerIndexA = get<1>(currentGame);
 		auto playerIndexB = get<2>(currentGame);
-		auto currBoard = boardVec[boardIndex];
-		string filenameA = playerNames[playerIndexA];
-		string filenameB = playerNames[playerIndexB];
-		auto playerA= GameUtils::loadAlgo(path, filenameA);
-		auto playerB= GameUtils::loadAlgo(path, filenameB);
+		auto currBoard = competition.boardVec[boardIndex];
+		string filenameA = competition.playerNames[playerIndexA];
+		string filenameB = competition.playerNames[playerIndexB];
+		auto playerA= GameUtils::loadAlgo(competition.path, filenameA);
+		auto playerB= GameUtils::loadAlgo(competition.path, filenameB);
 		BattleshipGame game(currBoard,playerA.first,playerB.first);
 		tuple<int, int, int> gameResults = game.playGame();		
 		unique_lock<mutex> lock2(dataMutex);
@@ -79,36 +79,43 @@ void CompetitionManager::threadWorker(PlayerComb& playerComb)
 		FreeLibrary(playerA.second);
 		FreeLibrary(playerB.second);
 	}
+	//print for debug purposes
 	unique_lock<mutex> lock1(debugMutex);
 	lock1.lock();
 	cout << std::this_thread::get_id() << " this thread is done mate" << endl;
 	lock1.unlock();	
 }
 
-
-void CompetitionManager::launcher()
+void CompetitionManager::launcher(CompetitionManager& competition)
 {
 	vector<thread> threads;
-	PlayerComb playerComb(numOfPlayers,numOfBoards,numOfGames);
-	thread t(threadWorker, std::ref(playerComb));
-	for (int i = 0; i < numOfThreads; i++)
-	{
-		thread t(threadWorker, std::ref(playerComb));
-		threads.emplace_back(threadWorker,std::ref(playerComb));
+	PlayerComb playerComb(competition.numOfPlayers, competition.numOfBoards);
+	//print for debug purposes
+	cout << "launching competition" << endl;
+	for (int i = 0; i < competition.numOfThreads; i++)
+	{		
+		threads.push_back(thread(threadWorker,std::ref(competition),std::ref(playerComb)));
 	}
 	//data registration loop
 	std::chrono::seconds duration;
 	while (!finished) {
 		unique_lock<mutex> lock1(queueMutex);
-		int gap = numOfGames / PRINT_FREQ;
+		int gap = competition.numOfGames / PRINT_FREQ;
 		result_printer.wait_for(lock1, std::chrono::seconds(2), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
-		printResults();
+		printResults(competition);
 	}
+	//for debug
+	if (currentNumOfGames != competition.numOfGames)
+		cout << "Error: num of games played is: " << currentNumOfGames << " but should have played: " << competition.numOfGames << "games" << endl;
 
+	//print final competition results (can be printed twice)
+	printResults(competition);
 	for (thread& t : threads)
 	{
 		t.join();
 	}
+	//print for debug purposes
+	cout << "finished competition" << endl;
 }
 
 void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB)
