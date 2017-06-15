@@ -7,7 +7,7 @@ void BSLogger::initLogger(string& basePath)
 	string loggerName = LOGGER_NAME;
 
 	// opening the log file
-	logger.open(basePath + loggerName, ios::out | ios::trunc);
+	logger.open(basePath + "\\" + loggerName, ios::out | ios::trunc);
 
 	// opening line of the logger
 	loggerPrint("Starting the program...");
@@ -25,7 +25,7 @@ string BSLogger::currentDateTime() {
 	struct tm  tstruct;
 	char       buf[80];
 	localtime_s(&tstruct, &now);
-	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	strftime(buf, sizeof(buf), "%d-%m-%Y, %X", &tstruct);
 
 	return buf;
 }
