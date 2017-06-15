@@ -40,8 +40,7 @@
 #define THREADS_DEFAULT 4
 
 using namespace std;
-typedef vector<vector<char>> char2DArray;
-typedef vector<vector<vector<char>>> char3DArray;
+
 
 class GameUtils
 {
