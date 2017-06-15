@@ -33,12 +33,12 @@ string BSLogger::currentDateTime() {
 
 void BSLogger::loggerPrintError(const string& msg)
 {
-	logger << currentDateTime().c_str() << ":\t" << ERROR;
+	logger << currentDateTime().c_str() << ":\t" << LOGGER_ERROR;
 	logger << msg.c_str() << endl;
 }
 
 void BSLogger::loggerPrintInfo(const string& msg)
 {
-	logger << currentDateTime().c_str() << ":\t" << INFO;
+	logger << currentDateTime().c_str() << ":\t" << LOGGER_INFO;
 	logger << msg.c_str() << endl;
 }

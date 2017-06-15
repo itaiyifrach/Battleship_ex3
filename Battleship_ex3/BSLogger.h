@@ -7,8 +7,8 @@
 using namespace std;
 
 #define LOGGER_NAME "game.log"
-#define ERROR "<ERROR> "
-#define INFO "<INFO> "
+#define LOGGER_ERROR "<ERROR> "
+#define LOGGER_INFO "<INFO> "
 
 // Global variable holding the logger
 extern ofstream logger;
