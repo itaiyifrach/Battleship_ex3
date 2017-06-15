@@ -29,9 +29,9 @@ public:
 	{
 		numOfShipsA = board_tuple.second;
 		numOfShipsB = board_tuple.second;
-		rows = board_tuple.first.size();
-		cols = board_tuple.first[0].size();
-		depth = board_tuple.first[0][0].size();
+		rows = int(board_tuple.first.size());
+		cols = int(board_tuple.first[0].size());
+		depth = int(board_tuple.first[0][0].size());
 		mainBoard = OurBoardData(board_tuple.first, rows, cols, depth, GAME_MANAGER_NUM);		
 		PlayerA->setPlayer(PLAYER_A_NUM);
 		PlayerB->setPlayer(PLAYER_B_NUM);

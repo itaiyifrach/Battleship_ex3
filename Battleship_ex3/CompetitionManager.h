@@ -31,7 +31,7 @@ mutex debugMutex;
 //condition variable for printer
 condition_variable result_printer;
 //atomic vars for the printing
-atomic<int> ourLastPrintNumOfGames = 0;
+int ourLastPrintNumOfGames = 0;
 atomic<int> currentNumOfGames = 0;
 //global var from PlayerComb.h
 extern bool finished;

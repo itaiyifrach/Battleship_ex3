@@ -4,7 +4,7 @@
 #include <random> //random generators
 #include <algorithm>  //std::shuffle
 #include <tuple>
-#include "CompetitionManager.h"
+
 
 
 using namespace std;

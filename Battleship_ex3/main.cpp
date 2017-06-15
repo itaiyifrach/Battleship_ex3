@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	}
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
 	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
-	competition.launcher();
+	CompetitionManager::launcher(competition);
 	
 	return 0;
 }
