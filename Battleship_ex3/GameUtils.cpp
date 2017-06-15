@@ -819,12 +819,6 @@ bool GameUtils::selfHit(char boardSymbol, int attackPlayer)
 	}
 }
 
-void GameUtils::freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec)
-{
-	for (int i = 0; i < playersVec.size(); i++)
-		FreeLibrary(playersVec[i].second);
-}
-
 
 int GameUtils::shipDirection(const OurBoardData& Board, const Coordinate& att) {
 	if (isHorizontal(Board, att)) {

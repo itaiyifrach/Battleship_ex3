@@ -24,19 +24,19 @@ class BattleshipGame
 	OurBoardData mainBoard;
 
 public:
-	BattleshipGame(pair<char3DArray, int>& board_tuple, IBattleshipGameAlgo* player_A, IBattleshipGameAlgo* player_B) :
+	BattleshipGame(pair<char3DArray, int>& board_pair, IBattleshipGameAlgo* player_A, IBattleshipGameAlgo* player_B) :
 		PlayerA(player_A), PlayerB(player_B)
 	{
-		numOfShipsA = board_tuple.second;
-		numOfShipsB = board_tuple.second;
-		rows = board_tuple.first.size();
-		cols = board_tuple.first[0].size();
-		depth = board_tuple.first[0][0].size();
-		mainBoard = OurBoardData(board_tuple.first, rows, cols, depth, GAME_MANAGER_NUM);		
+		numOfShipsA = board_pair.second;
+		numOfShipsB = board_pair.second;
+		rows = int(board_pair.first.size());
+		cols = int(board_pair.first[0].size());
+		depth = int(board_pair.first[0][0].size());		
+		mainBoard = OurBoardData(board_pair.first, rows, cols, depth, GAME_MANAGER_NUM);		
 		PlayerA->setPlayer(PLAYER_A_NUM);
 		PlayerB->setPlayer(PLAYER_B_NUM);
-		PlayerA->setBoard(OurBoardData(board_tuple.first, rows, cols, depth, PLAYER_A_NUM));
-		PlayerB->setBoard(OurBoardData(board_tuple.first, rows, cols, depth, PLAYER_B_NUM));
+		PlayerA->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_A_NUM));
+		PlayerB->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_B_NUM));
 	}
 
 	~BattleshipGame() = default;

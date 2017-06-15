@@ -93,9 +93,6 @@ public:
 
 	static bool selfHit(char boardSymbol, int attackPlayer);
 
-	//free all dll libs
-	static void freeLibs(vector<pair<unique_ptr<IBattleshipGameAlgo>, HINSTANCE>>& playersVec);
-
 	// Check the direction of the ship in "att" coordinate on "Board". return 0 if horizontal, 1 if vertical, 2 if into deep
 	static int shipDirection(const OurBoardData& Board, const Coordinate& att);
 	static bool isHorizontal(const OurBoardData& Board, const Coordinate& att);

@@ -23,7 +23,8 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 		<< setw(12) << left << "Pts Against";
 	cout << endl << endl;
 	//-----------------------------//
-	int playerNum, winsRatio;
+	int playerNum;
+	double winsRatio;
 	for (size_t i = 0; i<results.size(); i++) {
 		string num = std::to_string(i + 1);
 		num = num + '.';
@@ -48,10 +49,10 @@ bool CompetitionManager::percentCompare(pair<int, playerData> p1, pair<int, play
 
 int CompetitionManager::findMinGames()
 {
-	int minGames = INFINITY;
+	int minGames = INT_MAX;
 	for (int i = 0; i < playersData.size(); i++)
 		if (playersData[i].size() > minGames)
-			minGames = playersData[i].size();
+			minGames =int( playersData[i].size());
 	return minGames;
 }
 
@@ -62,7 +63,7 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		unique_lock<mutex> lock1(queueMutex);
 		lock1.lock();
 		tuple<int, int, int> currentGame = gamesQueue.getGameParams();
-		lock1.unlock;
+		lock1.unlock();
 		if (get<0>(currentGame) == -1)
 		{
 			break;
@@ -81,7 +82,7 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		unique_lock<mutex> lock2(dataMutex);
 		lock2.lock();
 		updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults), get<2>(gameResults));
-		lock2.unlock;
+		lock2.unlock();
 		result_printer.notify_one();
 		FreeLibrary(playerA.second);
 		FreeLibrary(playerB.second);
@@ -104,12 +105,14 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		threads.push_back(thread(threadWorker,std::ref(competition),std::ref(playerComb)));
 	}
 	//data registration loop
-	std::chrono::seconds duration;
+	
 	while (!finished) {
-		unique_lock<mutex> lock1(queueMutex);
+		unique_lock<mutex> lock1(printerMutex);
 		int gap = competition.numOfGames / PRINT_FREQ;
 		result_printer.wait_for(lock1, std::chrono::seconds(2), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
+		ourLastPrintNumOfGames = currentNumOfGames;
 		printResults(competition);
+		
 	}
 	//for debug
 	if (currentNumOfGames != competition.numOfGames)
@@ -128,13 +131,13 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB)
 {
 	playerData playerPrevDataA, playerPrevDataB;
-	int numOfGamesA = playersData[playerIndexA].size();
+	int numOfGamesA = int(playersData[playerIndexA].size());
 	if (numOfGamesA != 0)
 		playerPrevDataA = playersData[playerIndexA][numOfGamesA-1];
 	playerPrevDataA.pointsFor += pointsForPlayerA;
 	playerPrevDataA.pointsAgainst += pointsForPlayerB;
 	++playerPrevDataA.gamesPlayed;
-	int numOfGamesB= playersData[playerIndexB].size();
+	int numOfGamesB= int(playersData[playerIndexB].size());
 	if (numOfGamesB != 0)
 		playerPrevDataB = playersData[playerIndexB][numOfGamesB - 1];
 	playerPrevDataB.pointsFor += pointsForPlayerB;
