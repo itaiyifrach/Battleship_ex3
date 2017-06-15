@@ -13,9 +13,13 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 	// sorting by wins percentage
 	sort(results.begin(), results.end(), percentCompare);
 
+	// saving cout state to restore after using iomanip
+	ios oldState(nullptr);
+	oldState.copyfmt(cout);
 	//------------title------------//
-	cout << setw(8) << left << "#" << setw(24) << left << "Team Name" << setw(8) << left << "Wins"
-		<< setw(8) << left << "Losses" << setw(8) << left << "%" << setw(8) << left << "Pts For" 
+	cout << "# CYCLE: " << fixture << endl << endl;
+	cout << left << setw(8) << "#" << setw(24) << "Team Name" << setw(8) << "Wins"
+		<< setw(8) << "Losses" << setw(8) << "%" << setw(8) << "Pts For" 
 		<< setw(12) << left << "Pts Against";
 	cout << endl << endl;
 	//-----------------------------//
@@ -25,13 +29,16 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 		num = num + '.';
 		playerNum = results[i].first;
 		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
-		//TODO- PRINT ONLY 1 DECIMAL DIGIT
-		cout << setw(8) << left << num << setw(24) << left << competition.playerNames[playerNum] 
-			<< setw(8) << left << results[i].second.wins << setw(8) << left << results[i].second.losses 
-			<< setw(8) << left << winsRatio 
-			<< setw(8) << left << results[i].second.pointsFor << setw(12) << left << results[i].second.pointsAgainst;
+
+		cout << left << setw(8) << num << setw(24) << competition.playerNames[playerNum]
+			<< setw(8) << results[i].second.wins << setw(8) << results[i].second.losses;
+		cout.copyfmt(oldState);
+		cout << left << setw(8) << setprecision(4) << winsRatio;
+		cout.copyfmt(oldState);
+		cout << left << setw(8) << results[i].second.pointsFor << setw(12) << results[i].second.pointsAgainst;
 		cout << endl;
 	}
+	cout.copyfmt(oldState);
 
 }
 
