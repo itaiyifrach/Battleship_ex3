@@ -1,5 +1,6 @@
 #include "GameUtils.h"
 #include "BattleshipGame.h"
+#include "CompetitionManager.h"
 
 int main(int argc, char** argv) 
 {
@@ -38,9 +39,9 @@ int main(int argc, char** argv)
 		cout << NOT_ENOUGH_LEGAL << endl;		
 		return -1;
 	}
-
-	//CompetitionManager competition(std::move(boardVec), dllNames, numOfThreads);
-	//Competition.Start();
+	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
+	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
+	competition.launcher();
 	
 	return 0;
 }

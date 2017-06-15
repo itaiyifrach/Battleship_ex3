@@ -74,15 +74,24 @@ tuple<int,int,int> BattleshipGame::playGame() {
 		}
 		getNextAttack(turnOf, endGame, currAttack);
 	}	// end of while
-
+	int winnerNumber = -1;
 	//TODO- return results instead of printing them
 	if ((numOfShipsA) && (!numOfShipsB))
-		cout << PLAYER_A_WON_STR << endl;
+	{
+		winnerNumber = PLAYER_A_NUM;
+		//cout << PLAYER_A_WON_STR << endl;
+	}
+		
 	else if ((!numOfShipsA) && (numOfShipsB))
-		cout << PLAYER_B_WON_STR << endl;
-	cout << POINTS_STR << endl;
+	{		
+		winnerNumber = PLAYER_B_NUM;
+		//cout << PLAYER_B_WON_STR << endl;
+	}
+	return make_tuple(winnerNumber, scoreA, scoreB);
+		
+	/*cout << POINTS_STR << endl;
 	cout << PLAYER_A_POINTS_STR << scoreA << endl;
-	cout << PLAYER_B_POINTS_STR << scoreB << endl;
+	cout << PLAYER_B_POINTS_STR << scoreB << endl;*/
 }
 
 void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currAttack) const

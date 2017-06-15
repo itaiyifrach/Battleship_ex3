@@ -42,7 +42,7 @@ public:
 	~BattleshipGame() = default;
 
 
-	//Main loop of the gameplay
+	//Main loop of the gameplay-returns a tuple of <winnerNumber,points for player A,points for player B>
 	tuple<int, int, int> BattleshipGame::playGame();
 
 private:

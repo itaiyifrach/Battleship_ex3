@@ -127,6 +127,7 @@
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />
     <ClInclude Include="OurBoardData.h" />
+    <ClInclude Include="PlayerComb.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BattleshipGame.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="GameUtils.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OurBoardData.cpp" />
+    <ClCompile Include="PlayerComb.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

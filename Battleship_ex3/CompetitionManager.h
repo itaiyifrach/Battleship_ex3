@@ -1,6 +1,7 @@
 #pragma once
 #include "GameUtils.h"
 #include "BattleshipGame.h"
+#include "PlayerComb.h"
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
@@ -37,20 +38,26 @@ class CompetitionManager
 
 
 public:
-	CompetitionManager(vector<string>& dllNames, vector<pair<char3DArray, int>>& boardVec,list<string>& playerNames, int numOfThreads,string path, int numOfGames) :
-		 boardVec(boardVec), numOfThreads(numOfThreads), playerNames(playerNames.begin(), playerNames.end()), path(path),numOfGames(numOfGames) {};
-	void threadWorker();
-	void dataRegistration();
+	CompetitionManager( vector<pair<char3DArray, int>>& boardVec,list<string>& playerNames,string path, int numOfBoards,int numOfPlayers,int numOfGames, int numOfThreads) :
+		 boardVec(boardVec), playerNames(playerNames.begin(), playerNames.end()), path(path),
+		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(numOfThreads) {};
+	void threadWorker(PlayerComb& playerComb);	
 	void launcher();
 
 private:
 	vector<pair<char3DArray, int>> boardVec;
 	vector<string> playerNames;
-	int numOfThreads;
-	string path;
+	const string path;
+	const int numOfBoards;
+	const int numOfPlayers;
 	const int numOfGames;
-	void printResults(int fixture);
+	const int numOfThreads;		
+	bool finished = false;
+
+	//helper functions
+	void CompetitionManager::printResults();
 	static bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2);
 	int findMinGames() const;
-	bool finished = false;
+	static void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB);
+	
 };
