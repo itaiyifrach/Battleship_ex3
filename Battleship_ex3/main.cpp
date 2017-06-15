@@ -48,8 +48,8 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	//CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
-	//CompetitionManager::launcher(competition);
+	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
+	CompetitionManager::launcher(competition);
 	BSLogger::closeLogger();
 	return 0;
 }
