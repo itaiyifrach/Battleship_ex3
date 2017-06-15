@@ -132,12 +132,12 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	if (currentNumOfGames != competition.numOfGames)
 		cout << "Error: num of games played is: " << currentNumOfGames << " but should have played: " << competition.numOfGames << "games" << endl;
 
-	//print final competition results (can be printed twice)
-	printResults(competition);
 	for (thread& t : threads)
 	{
 		t.join();
 	}
+	//print final competition results (can be printed twice)
+	printResults(competition);
 	//print for debug purposes
 	cout << "finished competition" << endl;
 }
