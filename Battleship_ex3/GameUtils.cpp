@@ -92,11 +92,13 @@ int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 		if (GetLastError() != ERROR_FILE_NOT_FOUND)
 		{
 			cout << WRONG_PATH << basePath << endl;
+			BSLogger::loggerPrint((WRONG_PATH + basePath).c_str());
 			return -2;
 		}
 		else
 		{
 			cout << MISSING_BOARD << basePath << endl;
+			BSLogger::loggerPrint((MISSING_BOARD + basePath).c_str());
 			return -1;
 		}
 	}
@@ -125,7 +127,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 	vector<string> tokens = split(line, 'x');
 	if (tokens.size() != 3) {
-		// TODO: possible bonus here
+		BSLogger::loggerPrint("Error in board: please use format <cols>x<rows>x<depth> with positive numbers");
 		return char3DArray(0);
 	}
 	// by (COLS X ROWS X DEPTH)
@@ -137,7 +139,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	thirdStream >> depth;
 	if (firstStream.fail() || secondStream.fail() || thirdStream.fail() || rows<1  || cols<1 || depth<1)
 	{
-		// TODO: possible bonus here
+		BSLogger::loggerPrint("Error in board: please use format <cols>x<rows>x<depth> with positive numbers");
 		return char3DArray(0);
 	}	
 	

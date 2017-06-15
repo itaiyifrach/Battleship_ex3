@@ -68,6 +68,9 @@
     <ClInclude Include="PlayerComb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BSLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -89,6 +92,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerComb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BSLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

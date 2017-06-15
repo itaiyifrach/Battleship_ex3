@@ -1,6 +1,7 @@
 #include "GameUtils.h"
 #include "BattleshipGame.h"
 #include "CompetitionManager.h"
+#include "BSLogger.h"
 
 int main(int argc, char** argv) 
 {
@@ -10,6 +11,10 @@ int main(int argc, char** argv)
 	int numOfBoards = 0, numOfPlayers = 0, numOfGames = 0, numOfThreads = THREADS_DEFAULT;
 	
 	GameUtils::parseArgs(argc, argv, basePath, numOfThreads);
+
+	// creating the logger:
+	unique_ptr<BSLogger> logger = make_unique<BSLogger>(basePath);
+
 	auto check = GameUtils::parsePath(basePath, boardNames);
 	//check if path was invalid(error printed inside function)
 	if (check == -2)

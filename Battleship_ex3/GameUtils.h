@@ -14,6 +14,7 @@
 #include "IBattleshipGameAlgo.h"
 #include "OurBoardData.h"
 #include <memory>
+#include "BSLogger.h"
 
 #define PLAYER_A_NUM 0
 #define PLAYER_B_NUM 1
@@ -59,7 +60,7 @@ public:
 	static int parsePath(const string& basePath, vector<string>& boardNames);
 
 	//Loads all legal boards to vector
-	static int GameUtils::getBoards(const string& path, vector<string>& boardNames, vector<pair<char3DArray, int>>& boards);
+	static int getBoards(const string& path, vector<string>& boardNames, vector<pair<char3DArray, int>>& boards);
 
 	//Parse board from .sboard file
 	static char3DArray parseBoard(const string& path, const string& boardName, int& x, int& y, int& z);
@@ -68,11 +69,11 @@ public:
 	static list<string> getDLLNames(string& path);
 
 	//loads/checks algorithm from dll.
-	static bool GameUtils::checkAlgo(const string& path, const string& fileName);
+	static bool checkAlgo(const string& path, const string& fileName);
 	static pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
 
 	//Loads all players to vector
-	static int GameUtils::checkPlayers(const string& path, list<string>& dllNames);
+	static int checkPlayers(const string& path, list<string>& dllNames);
 
 	//Check if the board is valid
 	static int checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
