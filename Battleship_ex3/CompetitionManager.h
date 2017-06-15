@@ -29,6 +29,7 @@ vector<vector<playerData>> playersData;
 mutex printerMutex;
 mutex queueMutex;
 mutex dataMutex;
+mutex debugMutex;
 condition_variable result_printer;
 atomic<int> ourLastPrintNumOfGames = 0;
 atomic<int> currentNumOfGames = 0;

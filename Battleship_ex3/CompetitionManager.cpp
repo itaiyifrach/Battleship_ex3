@@ -79,7 +79,7 @@ void CompetitionManager::threadWorker(PlayerComb& playerComb)
 		FreeLibrary(playerA.second);
 		FreeLibrary(playerB.second);
 	}
-	unique_lock<mutex> lock1(queueMutex);
+	unique_lock<mutex> lock1(debugMutex);
 	lock1.lock();
 	cout << std::this_thread::get_id() << " this thread is done mate" << endl;
 	lock1.unlock();	
@@ -90,16 +90,19 @@ void CompetitionManager::launcher()
 {
 	vector<thread> threads;
 	PlayerComb playerComb(numOfPlayers,numOfBoards,numOfGames);
+	thread t(threadWorker, std::ref(playerComb));
 	for (int i = 0; i < numOfThreads; i++)
 	{
+		thread t(threadWorker, std::ref(playerComb));
 		threads.emplace_back(threadWorker,std::ref(playerComb));
 	}
 	//data registration loop
+	std::chrono::seconds duration;
 	while (!finished) {
 		unique_lock<mutex> lock1(queueMutex);
 		int gap = numOfGames / PRINT_FREQ;
-		result_printer.wait(lock1, [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
-		printResults;
+		result_printer.wait_for(lock1, std::chrono::seconds(2), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
+		printResults();
 	}
 
 	for (thread& t : threads)
