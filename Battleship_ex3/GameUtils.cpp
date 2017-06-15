@@ -17,6 +17,10 @@ void GameUtils::parseArgs(int argc, char** argv, string& basePath, int& numOfThr
 			if (numOfThreads <= 0)		// if number is invalid, set default
 			{
 				numOfThreads = THREADS_DEFAULT;
+				BSLogger::loggerPrintError("invalid -thread argument. Set number of thread to default = " + THREADS_DEFAULT);
+			}
+			else {
+				BSLogger::loggerPrintInfo("Set number of thread to " + numOfThreads);
 			}
 			break;
 		}
@@ -92,13 +96,13 @@ int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 		if (GetLastError() != ERROR_FILE_NOT_FOUND)
 		{
 			cout << WRONG_PATH << basePath << endl;
-			BSLogger::loggerPrint(WRONG_PATH + basePath);
+			BSLogger::loggerPrintError(WRONG_PATH + basePath);
 			return -2;
 		}
 		else
 		{
 			cout << MISSING_BOARD << basePath << endl;
-			BSLogger::loggerPrint(MISSING_BOARD + basePath);
+			BSLogger::loggerPrintError(MISSING_BOARD + basePath);
 			return -1;
 		}
 	}
@@ -127,7 +131,7 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 	vector<string> tokens = split(line, 'x');
 	if (tokens.size() != 3) {
-		BSLogger::loggerPrint("Error in board: please use format <cols>x<rows>x<depth> with positive numbers");
+		BSLogger::loggerPrintError(boardName + " please use format <cols>x<rows>x<depth> with positive numbers");
 		return char3DArray(0);
 	}
 	// by (COLS X ROWS X DEPTH)
@@ -139,14 +143,13 @@ char3DArray GameUtils::parseBoard(const string& path, const string& boardName, i
 	thirdStream >> depth;
 	if (firstStream.fail() || secondStream.fail() || thirdStream.fail() || rows<1  || cols<1 || depth<1)
 	{
-		BSLogger::loggerPrint("Error in board: please use format <cols>x<rows>x<depth> with positive numbers");
+		BSLogger::loggerPrintError(boardName + " please use format <cols>x<rows>x<depth> with positive numbers");
 		return char3DArray(0);
 	}	
 	
 	// memory allocation of the board, by (ROW X COLS X DEPTH)
 	auto board = allocateBoard(rows, cols, depth);
 	// skipping next line
-	// TODO: possible bonus here
 	getline(ifs, line);
 	
 	for (int k = 0; k < depth; k++)
@@ -627,6 +630,7 @@ void GameUtils::print2DBoard(char2DArray& board, int rows, int cols)
 
 int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<pair<char3DArray,int>>& boards)
 {
+	BSLogger::loggerPrintInfo(LOADING_BOARDS_START);
 	char shipMistakeTypeA, shipMistakeTypeB;
 	int numOfBoards = 0;
 	for (int j = 0; j < boardNames.size(); j++)
@@ -644,10 +648,10 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 				boards.push_back(make_pair(board,numOfShips));
 				numOfBoards++;				
 			}
-			// TODO: possible bonus here
 			else
 			{
 				cout << "Board #" << (j + 1) << " ERRORS:" << endl;
+				BSLogger::loggerPrintError(boardNames[j] + " is invalid... ERRORS:");
 				for (int i = 0; i < 5; i++)
 				{
 					if (mistakes[i] != 0)
@@ -657,19 +661,24 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 						case 0:
 							shipMistakeTypeA = mistakes[0];
 							cout << BOARD_MISTAKE_0 << shipMistakeTypeA << FOR_PLAYER << "A" << endl;
+							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeA) + FOR_PLAYER + 'A');
 							break;
 						case 1:
 							shipMistakeTypeB = mistakes[1];
 							cout << BOARD_MISTAKE_0 << shipMistakeTypeB << FOR_PLAYER << "B" << endl;
+							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeB) + FOR_PLAYER + 'B');
 							break;
 						case 2:
 							cout << BOARD_MISTAKE_2 << endl;
+							BSLogger::loggerPrintError(BOARD_MISTAKE_2);
 							break;
 						case 3:
 							cout << BOARD_MISTAKE_3 << endl;
+							BSLogger::loggerPrintError(BOARD_MISTAKE_3);
 							break;
 						case 4:
 							cout << BOARD_MISTAKE_4 << endl;
+							BSLogger::loggerPrintError(BOARD_MISTAKE_4);
 							break;
 						default:
 							break;
@@ -680,6 +689,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 			}	// end of else
 		}
 	}
+	BSLogger::loggerPrintInfo(LOADING_BOARDS_COMPLETE);
 	return numOfBoards;
 }
 
@@ -706,6 +716,7 @@ list<string> GameUtils::getDLLNames(string& path)
 	if (fileNames.size()<2)
 	{
 		cout << MISSING_ALGO << path << endl;
+		BSLogger::loggerPrintInfo(MISSING_ALGO + path);
 		return fileNames;
 	}
 	
@@ -757,6 +768,7 @@ bool GameUtils::checkAlgo(const string& path, const string& fileName)
 
 int GameUtils::checkPlayers(const string& path, list<string>& dllNames)
 {
+	BSLogger::loggerPrintInfo(LOADING_PLAYERS_START);
 	int numOfLegalPlayers = 0;
 	//go over all the players and remove invalid players from the list
 	for (std::list<string>::const_iterator iterator = dllNames.begin(), end = dllNames.end(); iterator != end; ++iterator)
@@ -772,6 +784,7 @@ int GameUtils::checkPlayers(const string& path, list<string>& dllNames)
 		}
 	}
 
+	BSLogger::loggerPrintInfo(LOADING_PLAYERS_COMPLETE);
 	return numOfLegalPlayers;
 }
 

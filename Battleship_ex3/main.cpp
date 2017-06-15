@@ -19,6 +19,7 @@ int main(int argc, char** argv)
 	//check if path was invalid(error printed inside function)
 	if (check == -2)
 	{
+		BSLogger::closeLogger();
 		return -1;
 	}
 	
@@ -27,26 +28,28 @@ int main(int argc, char** argv)
 	//check if number of dll's/boards is invalid (errors printed inside functions)
 	if (dllNames.size() < 2 || check == -1)
 	{
+		BSLogger::closeLogger();
 		return -1;
 	}
 	//loads all boards
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
-	//cout << "# of Valid BOARDS = " << numOfBoards << endl;
-	
-	//
 	numOfPlayers = GameUtils::checkPlayers(basePath,dllNames);
 	//print number of legal players and boards
 	cout << LEGAL_PLAYERS << numOfPlayers << endl;
+	BSLogger::loggerPrintInfo(LEGAL_PLAYERS + to_string(numOfPlayers));
 	cout << LEGAL_BOARDS << numOfBoards << endl;
+	BSLogger::loggerPrintInfo(LEGAL_BOARDS + to_string(numOfBoards));
 
 	if (numOfBoards < 1 || numOfPlayers < 2)
 	{
-		cout << NOT_ENOUGH_LEGAL << endl;		
+		cout << NOT_ENOUGH_LEGAL << endl;
+		BSLogger::loggerPrintError(NOT_ENOUGH_LEGAL);
+		BSLogger::closeLogger();
 		return -1;
 	}
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
-	CompetitionManager::launcher(competition);
+	//CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
+	//CompetitionManager::launcher(competition);
 	BSLogger::closeLogger();
 	return 0;
 }

@@ -10,11 +10,12 @@ void BSLogger::initLogger(string& basePath)
 	logger.open(basePath + "\\" + loggerName, ios::out | ios::trunc);
 
 	// opening line of the logger
-	loggerPrint("Starting the program...");
+	loggerPrintInfo("Starting the program...");
 
 }
 void BSLogger::closeLogger()
 {
+	loggerPrintInfo("Closing the program...");
 	// closing the log file
 	logger.close();
 }
@@ -30,8 +31,14 @@ string BSLogger::currentDateTime() {
 	return buf;
 }
 
-void BSLogger::loggerPrint(const string& msg)
+void BSLogger::loggerPrintError(const string& msg)
 {
-	logger << currentDateTime().c_str() << ":\t";
+	logger << currentDateTime().c_str() << ":\t" << ERROR;
+	logger << msg.c_str() << endl;
+}
+
+void BSLogger::loggerPrintInfo(const string& msg)
+{
+	logger << currentDateTime().c_str() << ":\t" << INFO;
 	logger << msg.c_str() << endl;
 }
