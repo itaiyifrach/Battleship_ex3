@@ -25,7 +25,7 @@ string BSLogger::currentDateTime() {
 	struct tm  tstruct;
 	char       buf[80];
 	localtime_s(&tstruct, &now);
-	strftime(buf, sizeof(buf), "%d-%m-%Y, %X", &tstruct);
+	strftime(buf, sizeof(buf), "%d-%m-%Y  %X", &tstruct);
 
 	return buf;
 }
