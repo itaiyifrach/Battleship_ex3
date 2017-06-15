@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	GameUtils::parseArgs(argc, argv, basePath, numOfThreads);
 
 	// creating the logger:
-	unique_ptr<BSLogger> logger = make_unique<BSLogger>(basePath);
+	BSLogger::initLogger(basePath);
 
 	auto check = GameUtils::parsePath(basePath, boardNames);
 	//check if path was invalid(error printed inside function)
@@ -47,6 +47,6 @@ int main(int argc, char** argv)
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
 	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
 	CompetitionManager::launcher(competition);
-	
+	BSLogger::closeLogger();
 	return 0;
 }

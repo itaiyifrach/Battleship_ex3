@@ -1,4 +1,23 @@
 #include "BSLogger.h"
+ofstream logger;
+
+
+void BSLogger::initLogger(string& basePath)
+{
+	string loggerName = LOGGER_NAME;
+
+	// opening the log file
+	logger.open(basePath + loggerName, ios::out | ios::trunc);
+
+	// opening line of the logger
+	loggerPrint("Starting the program...");
+
+}
+void BSLogger::closeLogger()
+{
+	// closing the log file
+	logger.close();
+}
 
 // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
 const char* BSLogger::currentDateTime() {

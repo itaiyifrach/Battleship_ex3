@@ -9,7 +9,7 @@
 
 using namespace std;
 //bool var to flag if all games have been played
-bool finished = false;
+extern bool finished;
 class PlayerComb
 {
 public:

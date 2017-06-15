@@ -1,4 +1,18 @@
 #include "CompetitionManager.h"
+//global structure to hold players data results
+vector<vector<playerData>> playersData;
+//global mutexs
+mutex printerMutex;
+mutex queueMutex;
+mutex dataMutex;
+mutex debugMutex;
+//condition variable for printer
+condition_variable result_printer;
+//atomic vars for the printing
+int ourLastPrintNumOfGames = 0;
+atomic<int> currentNumOfGames = 0;
+
+
 
 void CompetitionManager::printResults(CompetitionManager& competition) {
 	// creating vector of results

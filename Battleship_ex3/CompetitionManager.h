@@ -22,17 +22,17 @@ struct playerData
 
 };
 //global structure to hold players data results
-vector<vector<playerData>> playersData;
+extern vector<vector<playerData>> playersData;
 //global mutexs
-mutex printerMutex;
-mutex queueMutex;
-mutex dataMutex;
-mutex debugMutex;
+extern mutex printerMutex;
+extern mutex queueMutex;
+extern mutex dataMutex;
+extern mutex debugMutex;
 //condition variable for printer
-condition_variable result_printer;
+extern condition_variable result_printer;
 //atomic vars for the printing
-int ourLastPrintNumOfGames = 0;
-atomic<int> currentNumOfGames = 0;
+extern int ourLastPrintNumOfGames;
+extern atomic<int> currentNumOfGames;
 //global var from PlayerComb.h
 extern bool finished;
 

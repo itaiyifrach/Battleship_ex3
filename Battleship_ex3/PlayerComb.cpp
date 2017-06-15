@@ -1,4 +1,5 @@
 #include "PlayerComb.h"
+bool finished = false;
 
 deque<pair<int, int>> PlayerComb::buildQueue(int playerNum, int numOfPlayers)
 {
