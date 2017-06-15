@@ -16,6 +16,6 @@ class BSLogger
 public:
 	static void initLogger(string& basePath);
 	static void closeLogger();
-	static void loggerPrint(const char* msg);
-	static const char* currentDateTime();
+	static void loggerPrint(const string& msg);
+	static string currentDateTime();
 };

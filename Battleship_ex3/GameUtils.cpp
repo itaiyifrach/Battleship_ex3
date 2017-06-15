@@ -92,13 +92,13 @@ int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 		if (GetLastError() != ERROR_FILE_NOT_FOUND)
 		{
 			cout << WRONG_PATH << basePath << endl;
-			BSLogger::loggerPrint((WRONG_PATH + basePath).c_str());
+			BSLogger::loggerPrint(WRONG_PATH + basePath);
 			return -2;
 		}
 		else
 		{
 			cout << MISSING_BOARD << basePath << endl;
-			BSLogger::loggerPrint((MISSING_BOARD + basePath).c_str());
+			BSLogger::loggerPrint(MISSING_BOARD + basePath);
 			return -1;
 		}
 	}

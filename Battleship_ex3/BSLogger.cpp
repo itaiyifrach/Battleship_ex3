@@ -20,7 +20,7 @@ void BSLogger::closeLogger()
 }
 
 // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-const char* BSLogger::currentDateTime() {
+string BSLogger::currentDateTime() {
 	time_t     now = time(nullptr);
 	struct tm  tstruct;
 	char       buf[80];
@@ -30,8 +30,8 @@ const char* BSLogger::currentDateTime() {
 	return buf;
 }
 
-void BSLogger::loggerPrint(const char* msg)
+void BSLogger::loggerPrint(const string& msg)
 {
-	logger << currentDateTime() << ":\t";
-	logger << msg << endl;
+	logger << currentDateTime().c_str() << ":\t";
+	logger << msg.c_str() << endl;
 }
