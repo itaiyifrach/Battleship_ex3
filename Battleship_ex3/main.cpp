@@ -34,12 +34,12 @@ int main(int argc, char** argv)
 	}
 	//loads all boards
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
+	BSLogger::loggerPrintInfo(LEGAL_BOARDS + to_string(numOfBoards));
 	numOfPlayers = GameUtils::checkPlayers(basePath,dllNames);
+	BSLogger::loggerPrintInfo(LEGAL_PLAYERS + to_string(numOfPlayers));
 	//print number of legal players and boards
 	cout << LEGAL_PLAYERS << numOfPlayers << endl;
-	BSLogger::loggerPrintInfo(LEGAL_PLAYERS + to_string(numOfPlayers));
 	cout << LEGAL_BOARDS << numOfBoards << endl;
-	BSLogger::loggerPrintInfo(LEGAL_BOARDS + to_string(numOfBoards));
 
 	if (numOfBoards < 1 || numOfPlayers < 2)
 	{

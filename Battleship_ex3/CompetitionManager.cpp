@@ -142,6 +142,9 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 
 	//print for debug purposes
 	cout << "launching competition" << endl;
+	BSLogger::loggerPrintInfo(LAUNCHING_COMP + to_string(competition.numOfPlayers) + " players and "
+								+ to_string(competition.numOfBoards) + " boards");
+
 	int maxLengthName = getMaxLengthName(competition);
 	for (int i = 0; i < competition.numOfThreads; i++)
 	{		
@@ -172,6 +175,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	printResults(competition, maxLengthName);
 	//print for debug purposes
 	cout << "finished competition" << endl;
+	BSLogger::loggerPrintInfo(EXITING_COMP + to_string(currentNumOfGames) + " games");
 }
 
 void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB)
