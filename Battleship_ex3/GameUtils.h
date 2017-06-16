@@ -30,13 +30,17 @@
 #define MISSING_ALGO "Missing an algorithm (dll) file looking in path: "
 #define LOAD_DLL_ERR "Cannot load dll: "
 #define FOR_PLAYER " for player "
-#define NOT_ENOUGH_LEGAL "Error: insufficient legal files to start the competition"
+#define NOT_ENOUGH_LEGAL "insufficient legal files to start the competition"
 #define LEGAL_PLAYERS "Number of legal players: "
 #define LEGAL_BOARDS "Number of legal boards: "
 #define BOARD_MISTAKE_0 "Wrong size or shape for ship "
 #define BOARD_MISTAKE_2 "Adjacent Ships on Board"
 #define BOARD_MISTAKE_3 "The players don't have the same number of ships"
 #define BOARD_MISTAKE_4 "The players don't have the same types of ships"
+#define LOADING_BOARDS_START "Starting loading boards..."
+#define LOADING_BOARDS_COMPLETE "Loading boards completed"
+#define LOADING_PLAYERS_START "Starting loading players..."
+#define LOADING_PLAYERS_COMPLETE "Loading players completed"
 #define THREADS_DEFAULT 4
 
 using namespace std;

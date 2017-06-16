@@ -40,12 +40,10 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 	int playerNum;
 	double winsRatio;
 	for (size_t i = 0; i<results.size(); i++) {
-		string num = std::to_string(i + 1);
-		num = num + '.';
 		playerNum = results[i].first;
 		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
 
-		cout << left << setw(8) << num << setw(24) << competition.playerNames[playerNum]
+		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(24) << competition.playerNames[playerNum]
 			<< setw(8) << results[i].second.wins << setw(8) << results[i].second.losses;
 		cout.copyfmt(oldState);
 		cout << left << setw(8) << setprecision(4) << winsRatio;
