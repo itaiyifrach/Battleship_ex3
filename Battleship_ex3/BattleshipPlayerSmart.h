@@ -47,7 +47,7 @@ public:
 		downmostHit(-1, -1, -1), inmostHit(-1, -1, -1),
 		outmostHit(-1, -1, -1), playerNum(-1) {}
 
-	virtual void setPlayer(int player) {
+	virtual void setPlayer(int player) override {
 		playerNum = player;
 	}
 

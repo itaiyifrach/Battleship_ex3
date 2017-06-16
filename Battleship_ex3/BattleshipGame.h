@@ -34,7 +34,7 @@ public:
 		depth = int(board_pair.first[0][0].size());		
 		mainBoard = OurBoardData(board_pair.first, rows, cols, depth, GAME_MANAGER_NUM);		
 		PlayerA->setPlayer(PLAYER_A_NUM);
-		PlayerB->setPlayer(PLAYER_B_NUM);
+		PlayerB->setPlayer(PLAYER_B_NUM);		
 		PlayerA->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_A_NUM));
 		PlayerB->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_B_NUM));
 	}

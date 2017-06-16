@@ -105,7 +105,7 @@ list<Coordinate> BattleshipPlayerSmart::generateAllAttackMoves() const
 
 list<Coordinate> BattleshipPlayerSmart::generateAllAttackMoves() const
 {
-	srand((int)time(nullptr));
+	srand(int(time(nullptr)));
 	vector<Coordinate> MovesVec;
 	
 	for (int i = 1; i <= myBoard.rows(); ++i)

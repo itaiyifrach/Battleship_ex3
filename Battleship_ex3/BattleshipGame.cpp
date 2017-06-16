@@ -6,7 +6,6 @@ tuple<int,int,int> BattleshipGame::playGame() {
 	//0 iff its A's turn
 	int turnOf = 0;
 	bool endGame = false;
-
 	//initialize first attack (check if A/B have moves)
 	Coordinate currAttack = PlayerA->attack();
 	if (currAttack.row == -1)	

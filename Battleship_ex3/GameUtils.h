@@ -91,7 +91,7 @@ public:
 	static void print2DBoard(char2DArray& board, int rows, int cols);
 	static void print1DBoard(vector<char>& board, int n);
 
-	//returns the score-for-a-sink of a ship which is located in (i,j)th coordinate on mainBoard
+	//returns the score-for-a-sink of a ship which is located in (i,j,k)th coordinate on mainBoard
 	static int getScoreForSector(char boardSymbol);
 
 	static bool selfHit(char boardSymbol, int attackPlayer);
