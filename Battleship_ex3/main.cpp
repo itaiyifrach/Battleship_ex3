@@ -54,6 +54,7 @@ int main(int argc, char** argv)
 	auto gameResults=game.playGame();
 	string third = "game results:\nthe winner is player number " + std::to_string(get<0>(gameResults)) + "point for playerA: " + std::to_string(get<1>(gameResults)) + "points for playerB: " + std::to_string(get<2>(gameResults));
 	cout << third;*/
+	/*
 	int numOfShipsA = boardVec[0].second;
 	int numOfShipsB = boardVec[0].second;
 	int rows = int(boardVec[0].first.size());
@@ -67,6 +68,7 @@ int main(int argc, char** argv)
 	playerA->setBoard(OurBoardData(boardVec[0].first, rows, cols, depth, PLAYER_A_NUM));
 	playerB->setBoard(OurBoardData(boardVec[0].first, rows, cols, depth, PLAYER_B_NUM));
 	auto c = playerA->attack();
+	*/
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
 	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
 	CompetitionManager::launcher(competition);

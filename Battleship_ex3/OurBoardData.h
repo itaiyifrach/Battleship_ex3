@@ -10,9 +10,15 @@ class OurBoardData: public BoardData
 {
 public:
 	// Empty constructor for the game algorithm to start with something before SetBoard is called
-	OurBoardData() : _rows(0), _cols(0), _depth(0), _playerNum(-1), _board(char3DArray())	{}
+	OurBoardData() : _playerNum(-1), _board(char3DArray())	{}
 
-	OurBoardData(char3DArray& board, int rows, int cols, int depth, int playerNum) : _rows(rows), _cols(cols), _depth(depth), _playerNum(playerNum), _board(board) {}
+	OurBoardData(char3DArray& board, int rows, int cols, int depth, int playerNum) : _playerNum(playerNum), _board(board)
+	{
+		// this sets BoardData protected members:
+		this->_rows = rows;
+		this->_cols = cols;
+		this->_depth = depth;
+	}
 
 	virtual ~OurBoardData() = default;
 	
@@ -28,9 +34,6 @@ public:
 	void setSpace(const Coordinate& c);
 
 protected:
-	int _rows;
-	int _cols;
-	int _depth;
 	// 0 for player A, 1 for player b, 10 to GameManager
 	int _playerNum;
 private:

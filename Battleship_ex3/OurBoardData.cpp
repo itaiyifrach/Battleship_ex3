@@ -30,14 +30,18 @@ void OurBoardData::copyFromOtherDataBoard(const BoardData& playerBoard) {
 	_rows = playerBoard.rows();
 	_cols = playerBoard.cols();
 	_depth = playerBoard.depth();
+
 	// copy board cell by cell, relying on BoardData's interface.
+	_board.resize(_rows);
 	for (int i = 0; i < _rows; i++)
 	{
+		_board[i].resize(_cols);
 		for (int j = 0; j < _cols; j++)
 		{
+			_board[i][j].resize(_depth);
 			for (int k = 0; k < _depth; k++)
 			{
-				_board[i][j][k] = playerBoard.charAt(Coordinate(i+1,j+1,k+1));
+				_board[i][j][k] = playerBoard.charAt(Coordinate(i + 1, j + 1, k + 1));
 			}
 		}
 	}

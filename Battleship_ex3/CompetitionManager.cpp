@@ -105,8 +105,8 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		cout << third;*/
 		++currentNumOfGames;
 		result_printer.notify_one();
-		FreeLibrary(playerA.second);
-		FreeLibrary(playerB.second);
+		//FreeLibrary(playerA.second);
+		//FreeLibrary(playerB.second);
 		
 	//}
 	//print for debug purposes
@@ -133,7 +133,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	//data registration loop
 	unique_lock<mutex> lock1(printerMutex);		
 	int gap = max(1, competition.numOfGames / PRINT_FREQ);
-	while (!finished&&(currentNumOfGames!=competition.numOfThreads)) 
+	while (!finished && (currentNumOfGames != competition.numOfThreads)) 
 	{
 		if (result_printer.wait_for(lock1, std::chrono::seconds(3), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
 		{
