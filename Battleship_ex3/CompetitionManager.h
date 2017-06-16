@@ -44,7 +44,10 @@ class CompetitionManager
 public:
 	CompetitionManager( vector<pair<char3DArray, int>>& boardVec,list<string>& playerNames,string path, int numOfBoards,int numOfPlayers,int numOfGames, int numOfThreads) :
 		 boardVec(boardVec), playerNames(playerNames.begin(), playerNames.end()), path(path),
-		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(min(numOfThreads,numOfGames)) {};
+		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(min(numOfThreads,numOfGames))
+	{
+		playersData = vector<vector<playerData>>(numOfPlayers);
+	};
 	static void threadWorker(CompetitionManager& competition, PlayerComb& gamesQueue);
 	static void launcher(CompetitionManager& competition);
 

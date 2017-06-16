@@ -1,4 +1,5 @@
 #include "PlayerComb.h"
+#include <iostream>
 bool finished = false;
 
 deque<pair<int, int>> PlayerComb::buildQueue(int playerNum, int numOfPlayers)
@@ -39,9 +40,25 @@ tuple<int, int, int> PlayerComb::getGameParams()
 		
 
 	} while (currentIndex != prevIndex);
-	//if we checked every queue and they are all empty- then there are no more games left (isEmpty should be enough, this is for assurance)
+	//if we checked every queue and they are all empty- then there are no more games left
 	finished = true;
 	return make_tuple(-1, -1, -1);
 	
 	
+}
+
+void PlayerComb::printComb()
+{
+	for(int i=0;i<gamesQueue.size();i++)
+	{
+		cout << "queue number " << i << endl;
+		cout << "{ ";
+		for(int j=0;j<gamesQueue[i].size();j++)
+		{
+			cout << "<" << gamesQueue[i][j].first <<","<< gamesQueue[i][j].second << "> ";
+		}
+		cout << "}" << endl;
+	}
+
+
 }

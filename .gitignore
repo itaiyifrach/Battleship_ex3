@@ -240,3 +240,17 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Battleship_ex3/naive.dll
+/Battleship_ex3/naive - Copy.dll
+/Battleship_ex3/3d_board_10x10x1_0.sboard
+/Battleship_ex3/naive - Copy (4).dll
+/Battleship_ex3/naive - Copy (3).dll
+/Battleship_ex3/naive - Copy (2).dll
+/Battleship_ex3/good_board.sboard
+/Battleship_ex3/bad_board_4.sboard
+/Battleship_ex3/bad_board_1.sboard
+/Battleship_ex3/3d_board_15x15x15_1.sboard
+/Battleship_ex3/3d_board_15x15x15_0.sboard
+/Battleship_ex3/3d_board_10x10x6_1.sboard
+/Battleship_ex3/3d_board_10x10x6_0.sboard
+/Battleship_ex3/3d_board_10x10x1_1.sboard

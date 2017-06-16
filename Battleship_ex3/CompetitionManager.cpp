@@ -65,7 +65,7 @@ int CompetitionManager::findMinGames()
 {
 	int minGames = INT_MAX;
 	for (int i = 0; i < playersData.size(); i++)
-		if (playersData[i].size() > minGames)
+		if (playersData[i].size() < minGames)
 			minGames =int( playersData[i].size());
 	return minGames;
 }
@@ -74,44 +74,55 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 {
 	while (!finished)
 	{
-		unique_lock<mutex> lock1(queueMutex);
-		lock1.lock();
-		tuple<int, int, int> currentGame = gamesQueue.getGameParams();
-		lock1.unlock();
+		tuple<int, int, int> currentGame;
+		string first = "getting game\n";
+		{
+			lock_guard<mutex> lock1(queueMutex);			
+			cout << first;
+			currentGame = gamesQueue.getGameParams();			
+		}
+
 		if (get<0>(currentGame) == -1)
 		{
 			break;
-		}
-		++currentNumOfGames;
+		}	
+		
 		auto boardIndex = get<0>(currentGame);
 		auto playerIndexA = get<1>(currentGame);
 		auto playerIndexB = get<2>(currentGame);
+		string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
+		cout << second;
 		auto currBoard = competition.boardVec[boardIndex];
 		string filenameA = competition.playerNames[playerIndexA];
 		string filenameB = competition.playerNames[playerIndexB];
 		auto playerA= GameUtils::loadAlgo(competition.path, filenameA);
 		auto playerB= GameUtils::loadAlgo(competition.path, filenameB);
-		BattleshipGame game(currBoard,playerA.first,playerB.first);
-		tuple<int, int, int> gameResults = game.playGame();		
-		unique_lock<mutex> lock2(dataMutex);
-		lock2.lock();
-		updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults), get<2>(gameResults));
-		lock2.unlock();
+		BattleshipGame game(currBoard,playerA.first,playerB.first);		
+		tuple<int, int, int> gameResults = game.playGame();	
+		{
+			lock_guard<mutex> lock2(dataMutex);			
+			updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults), get<2>(gameResults));			
+		}
+
+		++currentNumOfGames;
 		result_printer.notify_one();
 		FreeLibrary(playerA.second);
 		FreeLibrary(playerB.second);
 	}
 	//print for debug purposes
-	unique_lock<mutex> lock1(debugMutex);
-	lock1.lock();
-	cout << std::this_thread::get_id() << " this thread is done mate" << endl;
-	lock1.unlock();	
+	{
+		lock_guard<mutex> lock1(debugMutex);		
+		cout << std::this_thread::get_id() << " this thread is done mate" << endl;
+	}
+
 }
 
 void CompetitionManager::launcher(CompetitionManager& competition)
 {
 	vector<thread> threads;
 	PlayerComb playerComb(competition.numOfPlayers, competition.numOfBoards);
+	playerComb.printComb();
+
 	//print for debug purposes
 	cout << "launching competition" << endl;
 	for (int i = 0; i < competition.numOfThreads; i++)
@@ -122,10 +133,12 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	
 	while (!finished) {
 		unique_lock<mutex> lock1(printerMutex);
-		int gap = competition.numOfGames / PRINT_FREQ;
-		result_printer.wait_for(lock1, std::chrono::seconds(2), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); });
-		ourLastPrintNumOfGames = currentNumOfGames;
-		printResults(competition);
+		int gap = max(1, competition.numOfGames / PRINT_FREQ);
+		if (result_printer.wait_for(lock1, std::chrono::seconds(5), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
+		{
+			ourLastPrintNumOfGames = currentNumOfGames;
+			printResults(competition);
+		}
 		
 	}
 	//for debug

@@ -27,6 +27,7 @@ public:
 	 }	 
 
 	 tuple<int, int, int> getGameParams();
+	 void printComb();
 
 private:
 	//games queue is a vector which holds for each player(indices according to vector of player filenames) a deque of pairs-
@@ -37,5 +38,5 @@ private:
 	int currentIndex = 0;	
 
 	static deque<pair<int, int>> buildQueue(int playerNum, int numOfPlayers);
-
+	
 };
