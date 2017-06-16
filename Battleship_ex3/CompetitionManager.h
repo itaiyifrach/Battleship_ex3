@@ -61,7 +61,8 @@ private:
 	const int numOfThreads;	
 
 	//helper functions
-	static void printResults(CompetitionManager& competition);
+	static void printResults(CompetitionManager& competition, int maxLengthName);
+	static int getMaxLengthName(CompetitionManager& competition);
 	static bool percentCompare(pair<int, playerData> p1, pair<int, playerData> p2);
 	static int findMinGames();
 	static void updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB);

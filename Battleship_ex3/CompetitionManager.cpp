@@ -14,7 +14,7 @@ atomic<int> currentNumOfGames = 0;
 
 
 
-void CompetitionManager::printResults(CompetitionManager& competition) {
+void CompetitionManager::printResults(CompetitionManager& competition, int maxLengthName) {
 	// creating vector of results
 	int fixture = findMinGames();
 	if (fixture == 0||fixture==INT_MAX)
@@ -30,9 +30,9 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 	// saving cout state to restore after using iomanip
 	ios oldState(nullptr);
 	oldState.copyfmt(cout);
-	//------------title------------//
+	//------------title------------//	
 	cout << "# CYCLE: " << fixture << endl << endl;
-	cout << left << setw(8) << "#" << setw(24) << "Team Name" << setw(8) << "Wins"
+	cout << left << setw(8) << "#" << setw(maxLengthName + 4) << "Team Name" << setw(8) << "Wins"
 		<< setw(8) << "Losses" << setw(8) << "%" << setw(8) << "Pts For" 
 		<< setw(12) << left << "Pts Against";
 	cout << endl << endl;
@@ -43,7 +43,7 @@ void CompetitionManager::printResults(CompetitionManager& competition) {
 		playerNum = results[i].first;
 		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
 
-		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(24) << competition.playerNames[playerNum]
+		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(maxLengthName + 4) << competition.playerNames[playerNum]
 			<< setw(8) << results[i].second.wins << setw(8) << results[i].second.losses;
 		cout.copyfmt(oldState);
 		cout << left << setw(8) << setprecision(4) << winsRatio;
@@ -68,10 +68,26 @@ int CompetitionManager::findMinGames()
 	return minGames;
 }
 
+int CompetitionManager::getMaxLengthName(CompetitionManager& competition)
+{
+	int maxLength = 0;
+	auto n = competition.playerNames.size();
+
+	for (auto i = 0; i < n; i++) {
+		auto tempLength = competition.playerNames[i].length();
+		if (maxLength <= tempLength)
+		{
+			maxLength = int(tempLength);
+		}
+	}
+
+	return maxLength;
+}
+
 void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerComb& gamesQueue)
 {
-	//while (!finished)
-		//{
+	while (!finished)
+		{
 		tuple<int, int, int> currentGame;
 		string first = "getting game\n";
 		{
@@ -80,10 +96,10 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 			currentGame = gamesQueue.getGameParams();			
 		}
 
-		// if (get<0>(currentGame) == -1)
-		//{
-		//	break;
-		//}
+		 if (get<0>(currentGame) == -1)
+		{
+			break;
+		}
 		
 		auto boardIndex = get<0>(currentGame);
 		auto playerIndexA = get<1>(currentGame);
@@ -108,7 +124,7 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		//FreeLibrary(playerA.second);
 		//FreeLibrary(playerB.second);
 		
-	//}
+	}
 	//print for debug purposes
 	{
 		lock_guard<mutex> lock1(debugMutex);		
@@ -126,6 +142,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 
 	//print for debug purposes
 	cout << "launching competition" << endl;
+	int maxLengthName = getMaxLengthName(competition);
 	for (int i = 0; i < competition.numOfThreads; i++)
 	{		
 		threads.push_back(thread(threadWorker,std::ref(competition),std::ref(playerComb)));
@@ -138,7 +155,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		if (result_printer.wait_for(lock1, std::chrono::seconds(3), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
 		{
 			ourLastPrintNumOfGames = currentNumOfGames;
-			printResults(competition);
+			printResults(competition, maxLengthName);
 		}
 		
 	}
@@ -152,7 +169,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		cout << "joined\n";
 	}
 	//print final competition results (can be printed twice)
-	printResults(competition);
+	printResults(competition, maxLengthName);
 	//print for debug purposes
 	cout << "finished competition" << endl;
 }
