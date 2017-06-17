@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <thread>
 
-#define PRINT_FREQ 10
+#define PRINT_FREQ 5
 #define LAUNCHING_COMP "The competition has started with "
 #define EXITING_COMP "The competition has ended after "
 

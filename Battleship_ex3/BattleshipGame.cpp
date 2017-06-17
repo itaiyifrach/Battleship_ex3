@@ -1,4 +1,3 @@
-
 #include "BattleshipGame.h"
 
 
@@ -22,7 +21,6 @@ tuple<int,int,int> BattleshipGame::playGame() {
 	}
 
 	while ((!endGame) && (numOfShipsA) && (numOfShipsB)) {
-		//attacks are saved between 1..ROWS in the files. We shift the coordinates to 0..(ROWS-1)
 		bool selfHit = false;
 		if (GameUtils::selfHit(mainBoard.charAt(currAttack), turnOf)) {
 			selfHit = true;
@@ -49,8 +47,8 @@ tuple<int,int,int> BattleshipGame::playGame() {
 				scoreB += sectorScore;
 				numOfShipsA--;
 			}
-		}			
-		
+		}
+
 		//Notify players on results
 		//TODO-is the change from i+1,j+1 to currAttack is fine?
 		PlayerA->notifyOnAttackResult(turnOf, currAttack, currAttackRes);
@@ -73,6 +71,7 @@ tuple<int,int,int> BattleshipGame::playGame() {
 		}
 		getNextAttack(turnOf, endGame, currAttack);
 	}	// end of while
+
 	int winnerNumber = -1;
 	//TODO- return results instead of printing them
 	if ((numOfShipsA) && (!numOfShipsB))
@@ -85,6 +84,9 @@ tuple<int,int,int> BattleshipGame::playGame() {
 	{		
 		winnerNumber = PLAYER_B_NUM;
 		//cout << PLAYER_B_WON_STR << endl;
+	}
+	else {
+		return make_tuple(winnerNumber, 0, 0);
 	}
 	return make_tuple(winnerNumber, scoreA, scoreB);
 		
@@ -167,7 +169,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 
 		//count how many parts of the ship remain un-hit
 		int count = 0;
-		while ((colIndex < cols) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32))
+		while ((colIndex <= cols) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32))
 		{
 			if (mainBoard.charAt(Coordinate(att.row, colIndex++, att.depth)) != 'X') {
 				count++;
@@ -176,7 +178,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 		//if we have only one un-hit part, it was the initial part in (i,j,k), we erase the ship and return that it's a sink
 		if (count == 1) {
 			colIndex = left;
-			while ((colIndex < cols) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32)) {
+			while ((colIndex <= cols) && (mainBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32)) {
 				mainBoard.setSpace(Coordinate(att.row, colIndex++, att.depth));
 			}
 			return true;
@@ -201,7 +203,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 
 		//count how many parts of the ship remain un-hit
 		int count = 0;
-		while ((rowIndex < rows) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
+		while ((rowIndex <= rows) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
 			if (mainBoard.charAt(Coordinate(rowIndex++, att.col, att.depth)) != 'X') {
 				count++;
 			}
@@ -210,7 +212,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 		//if we have only one un-hit part and it was the initial part in (i,j,k), we erase the ship and return that it's a sink
 		if ((count == 1) && (mainBoard.charAt(att)!='X') && (mainBoard.charAt(att) != 32)) {
 			rowIndex = lower;
-			while ((rowIndex < rows) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
+			while ((rowIndex <= rows) && (mainBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32)) {
 				mainBoard.setSpace(Coordinate(rowIndex++, att.col, att.depth));
 			}
 			return true;
@@ -233,7 +235,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 
 		//count how many parts of the ship remain un-hit
 		int count = 0;
-		while ((depthIndex < depth) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
+		while ((depthIndex <= depth) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
 			if (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex++)) != 'X') {
 				count++;
 			}
@@ -242,7 +244,7 @@ bool BattleshipGame::updateBoardAndCheckSink(const Coordinate& att)
 		//if we have only one un-hit part, it was the initial part in (i,j,k), we erase the ship and return that it's a sink
 		if (count == 1) {
 			depthIndex = deepest;
-			while ((depthIndex < depth) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
+			while ((depthIndex <= depth) && (mainBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32)) {
 				mainBoard.setSpace(Coordinate(att.row, att.col, depthIndex++));
 			}
 			return true;

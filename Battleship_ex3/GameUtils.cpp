@@ -197,21 +197,30 @@ int GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int
 	for (int i = 0; i < depth; i++)
 	{
 		boardCut = getBoardCut(board, rows, cols, i, 2);
+		//print2DBoard(boardCut, rows, cols);
 		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by COLS
 	for (int i = 0; i < cols; i++)
 	{
 		boardCut = getBoardCut(board, rows, depth, i, 1);
+		//print2DBoard(boardCut, rows, depth);
 		checkBoardCut(boardCut, rows, depth, mistakes, shipsTypeA, shipsTypeB);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by ROWS
 	for (int i = 0; i < rows; i++)
 	{
 		boardCut = getBoardCut(board, depth, cols, i, 0);
+		//print2DBoard(boardCut, depth, cols);
 		checkBoardCut(boardCut, depth, cols, mistakes, shipsTypeA, shipsTypeB);
+		//print1DBoard(shipsTypeA, 5);
+		//print1DBoard(shipsTypeB, 5);
 	}
 	// checking number of valid ships of players A and B:
 	if (shipsTypeA[0] != shipsTypeB[0]) {
@@ -320,7 +329,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			default:
 				continue;
 			}
-
+			//print2DBoard(markedBoard, rows, cols);
 			if (validShape == true)
 			{
 				if (currPlayer == 0)
@@ -336,6 +345,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			}
 		}
 	}	
+	//print2DBoard(markedBoard, rows, cols);
 	//finished scanning the board
 }
 
@@ -563,6 +573,26 @@ void GameUtils::print1DBoard(vector<char>& board, int n)
 	cout << " " << endl;
 }
 
+void GameUtils::printBoardData(const BoardData& board) {
+	cout << "===========SHOWING BOARD===========";
+	cout << "\nrows: " << board.rows() << " cols: " << board.cols() << " depth: " << board.depth() << endl;
+	cout << endl;
+	for (int k = 1; k <= board.depth(); k++) {
+		cout << "DEPTH #" << k << endl;
+		for (int i = 1; i <= board.rows(); i++)
+		{
+			cout << " " << endl;
+			for (int j = 1; j <= board.cols(); j++)
+			{
+				cout << board.charAt(Coordinate(i,j,k)) << " ";
+			}
+		}
+		cout << endl;
+	}
+	cout << "===================================";
+	cout << endl;
+}
+
 
 void GameUtils::print3DBoard(char3DArray& board, int rows, int cols, int depth)
 {
@@ -622,6 +652,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 			}
 			else
 			{
+				cout << "Board #" << (j + 1) << " ERRORS:" << endl;
 				BSLogger::loggerPrintError(boardNames[j] + " is invalid... ERRORS:");
 				for (int i = 0; i < 5; i++)
 				{
@@ -631,19 +662,24 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 						{
 						case 0:
 							shipMistakeTypeA = mistakes[0];
+							cout << BOARD_MISTAKE_0 << shipMistakeTypeA << FOR_PLAYER << "A" << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeA) + FOR_PLAYER + 'A');
 							break;
 						case 1:
 							shipMistakeTypeB = mistakes[1];
+							cout << BOARD_MISTAKE_0 << shipMistakeTypeB << FOR_PLAYER << "B" << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeB) + FOR_PLAYER + 'B');
 							break;
 						case 2:
+							cout << BOARD_MISTAKE_2 << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_2);
 							break;
 						case 3:
+							cout << BOARD_MISTAKE_3 << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_3);
 							break;
 						case 4:
+							cout << BOARD_MISTAKE_4 << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_4);
 							break;
 						default:
@@ -651,6 +687,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 						}
 					}
 				}
+				cout << endl;
 			}	// end of else
 		}
 	}
@@ -833,7 +870,7 @@ bool GameUtils::isVertical(const OurBoardData& Board, const Coordinate& att) {
 			return true;
 		}
 	}
-	else if (att.col == Board.cols())
+	else if (att.row == Board.cols())
 	{
 		if ((Board.charAt(Coordinate(Board.rows() - 1, att.col, att.depth)) != 32) &&
 			(Board.charAt(Coordinate(Board.rows() - 1, att.col, att.depth)) != '%'))

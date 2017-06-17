@@ -59,6 +59,4 @@ void PlayerComb::printComb()
 		}
 		cout << "}" << endl;
 	}
-
-
 }

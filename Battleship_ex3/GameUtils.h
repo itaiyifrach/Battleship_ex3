@@ -88,6 +88,7 @@ public:
 	static char2DArray getBoardCut(char3DArray& board, int rows, int cols, int depth, int cutBy);
 
 	//Prints the board to console (for debug purposes)
+	static void printBoardData(const BoardData& board);
 	static void print3DBoard(char3DArray& board, int rows, int cols, int depth);
 	static void print2DBoard(char2DArray& board, int rows, int cols);
 	static void print1DBoard(vector<char>& board, int n);

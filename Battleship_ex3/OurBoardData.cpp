@@ -13,11 +13,11 @@ char OurBoardData::charAt(Coordinate c) const
 		(_board[c.row - 1][c.col - 1][c.depth - 1] == '%')) {
 		return _board[c.row - 1][c.col - 1][c.depth - 1];
 	}
-	if (_playerNum == 0) {
+	else if (_playerNum == 0) {
 		if ((65 < _board[c.row - 1][c.col - 1][c.depth - 1]) && (_board[c.row - 1][c.col - 1][c.depth - 1] < 90)){
 			return _board[c.row - 1][c.col - 1][c.depth - 1];
 		}
-	} else {
+	} else if (_playerNum == 1) {
 		if ((97 < _board[c.row - 1][c.col - 1][c.depth - 1]) && (_board[c.row - 1][c.col - 1][c.depth - 1] < 122)) {
 			return _board[c.row - 1][c.col - 1][c.depth - 1];
 		}

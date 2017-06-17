@@ -11,36 +11,32 @@
 
 class BattleshipGame
 {
-
-	unique_ptr<IBattleshipGameAlgo> PlayerA;
-	unique_ptr<IBattleshipGameAlgo> PlayerB;
+	IBattleshipGameAlgo* PlayerA;
+	IBattleshipGameAlgo* PlayerB;
 	int numOfShipsA;
 	int numOfShipsB;
 	int rows;
 	int cols;
 	int depth;
-	int scoreA = 0;
-	int scoreB = 0;
 	OurBoardData mainBoard;
+	int scoreA;
+	int scoreB;
 
 public:
 	BattleshipGame(pair<char3DArray, int>& board_pair, IBattleshipGameAlgo* player_A, IBattleshipGameAlgo* player_B) :
-		PlayerA(player_A), PlayerB(player_B)
+		PlayerA(player_A), PlayerB(player_B),
+		numOfShipsA(board_pair.second), numOfShipsB(board_pair.second),
+		rows(int(board_pair.first.size())), cols(int(board_pair.first[0].size())), depth(int(board_pair.first[0][0].size())),
+		mainBoard(board_pair.first, rows, cols, depth, GAME_MANAGER_NUM),
+		scoreA(0), scoreB(0)
 	{
-		numOfShipsA = board_pair.second;
-		numOfShipsB = board_pair.second;
-		rows = int(board_pair.first.size());
-		cols = int(board_pair.first[0].size());
-		depth = int(board_pair.first[0][0].size());		
-		mainBoard = OurBoardData(board_pair.first, rows, cols, depth, GAME_MANAGER_NUM);		
 		PlayerA->setPlayer(PLAYER_A_NUM);
 		PlayerB->setPlayer(PLAYER_B_NUM);		
 		PlayerA->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_A_NUM));
 		PlayerB->setBoard(OurBoardData(board_pair.first, rows, cols, depth, PLAYER_B_NUM));
-	}
+	}	
 
 	~BattleshipGame() = default;
-
 
 	//Main loop of the gameplay-returns a tuple of <winnerNumber,points for player A,points for player B>
 	tuple<int, int, int> BattleshipGame::playGame();

@@ -1,16 +1,18 @@
 ﻿#include "BattleshipPlayerSmart.h"
 
 void BattleshipPlayerSmart::setBoard(const BoardData& playerBoard) {
-
+	// Reset all player's attributes on call of setBoard (except player's number)
+	state = AttackState::searchForFirstHit;
+	nextAttack = leftmostHit = rightmostHit = upmostHit = downmostHit = inmostHit = outmostHit = Coordinate(-1, -1, -1);
 	myBoard.copyFromOtherDataBoard(playerBoard);
 
-	for (int i = 1; i <= myBoard.rows(); ++i)
+	for (int k = 1; k <= myBoard.cols(); ++k)
 	{
-		for (int j = 1; j <= myBoard.cols(); ++j)
+		for (int i = 1; i <= myBoard.rows(); ++i)
 		{
-			for (int k = 1; k <= myBoard.cols(); ++k)
-			{
-				if (myBoard.charAt(Coordinate(i, j, k)) != 32)
+			for (int j = 1; j <= myBoard.cols(); ++j)
+			{			
+				if (playerBoard.charAt(Coordinate(i, j, k)) != 32)
 				{
 					myBoard.setMiss(Coordinate(i, j, k));
 					if (i > 1)
@@ -107,21 +109,20 @@ list<Coordinate> BattleshipPlayerSmart::generateAllAttackMoves() const
 {
 	srand(int(time(nullptr)));
 	vector<Coordinate> MovesVec;
-	
-	for (int i = 1; i <= myBoard.rows(); ++i)
+
+	for (int k = 1; k <= myBoard.depth(); ++k)
 	{
-		for (int j = 1; j <= myBoard.cols(); ++j)
+		for (int i = 1; i <= myBoard.rows(); ++i)
 		{
-			for (int k = 1; k <= myBoard.depth(); ++k)
+			for (int j = 1; j <= myBoard.cols(); ++j)
 			{
-				if (myBoard.charAt(Coordinate(i, j, k)) != 32)
+				if (myBoard.charAt(Coordinate(i, j, k)) == 32)
 				{
 					MovesVec.emplace_back(i, j, k);
 				}
 			}
 		}
 	}
-
 	random_device rd;
 	mt19937 g(rd());
 	std::shuffle(MovesVec.begin(), MovesVec.end(), g);
@@ -143,6 +144,7 @@ void BattleshipPlayerSmart::searchForNextFirstHit(Coordinate att, AttackResult r
 	 
 	//set next attack start point and reset state machine
 	state = AttackState::searchForFirstHit;
+	leftmostHit = rightmostHit = upmostHit = downmostHit = inmostHit = outmostHit = Coordinate(-1, -1, -1);
 	if (attackMoves.empty()) {
 		nextAttack = Coordinate(-1, -1, -1);
 	} else {
@@ -189,7 +191,7 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 			setMissAndRemoveCoordinate(Coordinate(att.row, colIndex - 1, att.depth));
 			
 		}
-		while ((colIndex < myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32) &&
+		while ((colIndex <= myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32) &&
 			(myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != '%'))
 		{
 			if (att.row > 1)
@@ -234,7 +236,7 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 		{
 			setMissAndRemoveCoordinate(Coordinate(rowIndex - 1, att.col, att.depth));
 		}
-		while ((rowIndex < myBoard.rows()) && (myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32) &&
+		while ((rowIndex <= myBoard.rows()) && (myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != 32) &&
 			(myBoard.charAt(Coordinate(rowIndex, att.col, att.depth)) != '%'))
 		{
 			if (att.col > 1)
@@ -278,7 +280,7 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 		{
 			setMissAndRemoveCoordinate(Coordinate(att.row, att.col, depthIndex - 1));
 		}
-		while ((depthIndex < myBoard.depth()) && (myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32) &&
+		while ((depthIndex <= myBoard.depth()) && (myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != 32) &&
 			(myBoard.charAt(Coordinate(att.row, att.col, depthIndex)) != '%'))
 		{
 			if (att.row > 1)
@@ -751,7 +753,7 @@ void BattleshipPlayerSmart::foundDepthAttInsideTransition(Coordinate att, Attack
 		if ((inmostHit.depth > 1) && (myBoard.charAt(Coordinate(inmostHit.depth - 1, upmostHit.col, upmostHit.depth)) == 32))
 		{
 			nextAttack = inmostHit;
-			inmostHit.depth--;
+			nextAttack.depth--;
 		}
 		else {
 			state = AttackState::foundDepthAttOutside;

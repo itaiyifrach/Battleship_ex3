@@ -12,7 +12,7 @@ public:
 	// Empty constructor for the game algorithm to start with something before SetBoard is called
 	OurBoardData() : _playerNum(-1), _board(char3DArray())	{}
 
-	OurBoardData(char3DArray& board, int rows, int cols, int depth, int playerNum) : _playerNum(playerNum), _board(board)
+	OurBoardData(char3DArray board, int rows, int cols, int depth, int playerNum) : _playerNum(playerNum), _board(board)
 	{
 		// this sets BoardData protected members:
 		this->_rows = rows;
