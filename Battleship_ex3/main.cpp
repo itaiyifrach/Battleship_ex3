@@ -55,5 +55,6 @@ int main(int argc, char** argv)
 	CompetitionManager::launcher(competition);
 	BSLogger::closeLogger();
 	GameUtils::freeLibs(playersVec);
+	cout << "end" << endl;
 	return 0;
 }

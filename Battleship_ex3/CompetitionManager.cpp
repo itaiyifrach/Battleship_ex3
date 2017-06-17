@@ -111,8 +111,10 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 			tuple<int, int, int> gameResults = game.playGame();
 			updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults), get<2>(gameResults));
 			++currentNumOfGames;
+			//cout << currentNumOfGames<<endl;
 			result_printer.notify_one();
 		}
+		cout << "finished thread" << endl;
 
 
 }
@@ -134,12 +136,12 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	int gap = max(1, competition.numOfGames / 10);
 	while (!finished ) 
 	{
-		if (result_printer.wait_for(lock1, std::chrono::seconds(3),
+		result_printer.wait(lock1,
 			[gap,competition] {
 			if (currentNumOfGames == competition.numOfGames)
 				return true;
 			return (currentNumOfGames >= ourLastPrintNumOfGames + gap);			
-			}))
+		});
 		{
 			ourLastPrintNumOfGames = currentNumOfGames;
 			printResults(competition, maxLengthName);
@@ -150,7 +152,9 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	for (thread& t : threads)
 	{
 		t.join();
+		cout << "join" << endl;
 	}
+	cout << "competition ended" << endl;
 	//print final competition results (can be printed twice)
 	printResults(competition, maxLengthName);
 	BSLogger::loggerPrintInfo(EXITING_COMP + to_string(currentNumOfGames) + " games");
