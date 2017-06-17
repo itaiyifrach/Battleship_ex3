@@ -35,7 +35,8 @@ int main(int argc, char** argv)
 	//loads all boards
 	numOfBoards = GameUtils::getBoards(basePath, boardNames, boardVec);
 	BSLogger::loggerPrintInfo(LEGAL_BOARDS + to_string(numOfBoards));
-	numOfPlayers = GameUtils::checkPlayers(basePath,dllNames);
+	auto playersVec = GameUtils::loadPlayers(basePath,dllNames);
+	numOfPlayers = int(playersVec.size());
 	BSLogger::loggerPrintInfo(LEGAL_PLAYERS + to_string(numOfPlayers));
 	//print number of legal players and boards
 	cout << LEGAL_PLAYERS << numOfPlayers << endl;
@@ -70,8 +71,9 @@ int main(int argc, char** argv)
 	auto c = playerA->attack();
 	*/
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	CompetitionManager competition(boardVec, dllNames, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
+	CompetitionManager competition(boardVec, dllNames, playersVec, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
 	CompetitionManager::launcher(competition);
 	BSLogger::closeLogger();
+	GameUtils::freeLibs(playersVec);
 	return 0;
 }

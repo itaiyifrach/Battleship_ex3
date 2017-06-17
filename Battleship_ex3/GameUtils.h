@@ -43,6 +43,8 @@
 #define LOADING_PLAYERS_COMPLETE "Loading players completed"
 #define THREADS_DEFAULT 4
 
+// define function of the type we expect
+typedef IBattleshipGameAlgo *(*GetAlgoFuncType)();
 using namespace std;
 
 
@@ -71,12 +73,11 @@ public:
 	//finds all *.dll files of given path and returns a sorted vector of them
 	static list<string> getDLLNames(string& path);
 
-	//loads/checks algorithm from dll.
-	static bool checkAlgo(const string& path, const string& fileName);
-	static pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
+	//loads algorithm from dll	
+	static pair<GetAlgoFuncType, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
 
 	//Loads all players to vector
-	static int checkPlayers(const string& path, list<string>& dllNames);
+	static vector<pair<GetAlgoFuncType, HINSTANCE>> GameUtils::loadPlayers(const string& path, list<string>& dllNames);
 
 	//Check if the board is valid
 	static int checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
@@ -102,4 +103,6 @@ public:
 	static bool isVertical(const OurBoardData& Board, const Coordinate& att);
 	
 	static bool coordinatesComparator(const Coordinate& first, const Coordinate& second);
+	//free dll's
+	static void GameUtils::freeLibs(vector<pair<GetAlgoFuncType, HINSTANCE>>& playersVec);
 };

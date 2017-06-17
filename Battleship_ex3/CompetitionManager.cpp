@@ -107,11 +107,7 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
 		cout << second;
 		auto currBoard = competition.boardVec[boardIndex];
-		string filenameA = competition.playerNames[playerIndexA];
-		string filenameB = competition.playerNames[playerIndexB];
-		auto playerA= GameUtils::loadAlgo(competition.path, filenameA);
-		auto playerB= GameUtils::loadAlgo(competition.path, filenameB);
-		BattleshipGame game(currBoard,playerA.first,playerB.first);		
+		BattleshipGame game(currBoard, competition.playersVec[playerIndexA].first(), competition.playersVec[playerIndexB].first());
 		//tuple<int, int, int> gameResults = game.playGame();
 		{
 			lock_guard<mutex> lock2(dataMutex);			
@@ -120,10 +116,7 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		/*string third = "game results:\nthe winner is player number " + std::to_string(get<0>(gameResults))+" point for playerA: "+ std::to_string(get<1>(gameResults))+" points for playerB: "+ std::to_string(get<2>(gameResults))+"\n";
 		cout << third;*/
 		++currentNumOfGames;
-		result_printer.notify_one();
-		//FreeLibrary(playerA.second);
-		//FreeLibrary(playerB.second);
-		
+		result_printer.notify_one();		
 	}
 	//print for debug purposes
 	{

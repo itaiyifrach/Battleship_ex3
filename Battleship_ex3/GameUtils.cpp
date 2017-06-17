@@ -724,7 +724,7 @@ list<string> GameUtils::getDLLNames(string& path)
 
 }
 
-//assumes algo is valid
+/*
 pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
 {
 	
@@ -738,20 +738,17 @@ pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, c
 	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll,"GetAlgorithm"));		
 	return make_pair(getAlgoFunc(), hDll);
 
-}
+}*/
 
-bool GameUtils::checkAlgo(const string& path, const string& fileName)
+pair<GetAlgoFuncType,HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName)
 {
-
-	// define function of the type we expect
-	typedef IBattleshipGameAlgo *(*GetAlgoFuncType)();
 	GetAlgoFuncType getAlgoFunc;
 	string algoPath = path + "\\" + fileName;
 	// Load dynamic library
 	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary
 	if (!hDll)
 	{
-		return false;
+		return make_pair(nullptr, nullptr);		
 	}
 
 	// Get function pointer
@@ -759,33 +756,33 @@ bool GameUtils::checkAlgo(const string& path, const string& fileName)
 	if (!getAlgoFunc)
 	{
 		FreeLibrary(hDll);
-		return false;
+		return make_pair(nullptr, nullptr);
 	}
-	FreeLibrary(hDll);
-	return true;
+	
+	return make_pair(getAlgoFunc, hDll);
 
 }
 
-int GameUtils::checkPlayers(const string& path, list<string>& dllNames)
+vector<pair<GetAlgoFuncType, HINSTANCE>> GameUtils::loadPlayers(const string& path, list<string>& dllNames)
 {
 	BSLogger::loggerPrintInfo(LOADING_PLAYERS_START);
-	int numOfLegalPlayers = 0;
+	vector<pair<GetAlgoFuncType, HINSTANCE>> playersVec;
 	//go over all the players and remove invalid players from the list
 	for (std::list<string>::const_iterator iterator = dllNames.begin(), end = dllNames.end(); iterator != end; ++iterator)
 	{
-		auto check = checkAlgo(path, *iterator);
-		if(check)
+		auto algo_pair = loadAlgo(path, *iterator);
+		if(!(algo_pair.first)||!(algo_pair.second))
 		{			
-			numOfLegalPlayers++;
+			dllNames.erase(iterator);
 		}
 		else
 		{
-			dllNames.erase(iterator);
+			playersVec.push_back(algo_pair);
 		}
 	}
 
 	BSLogger::loggerPrintInfo(LOADING_PLAYERS_COMPLETE);
-	return numOfLegalPlayers;
+	return playersVec;
 }
 
 int GameUtils::getScoreForSector(char boardSymbol) {
@@ -909,4 +906,11 @@ bool GameUtils::isVertical(const OurBoardData& Board, const Coordinate& att) {
 
 bool GameUtils::coordinatesComparator(const Coordinate& first, const Coordinate& second) {
 	return ((first.row == second.row) && (first.col == second.col) && (first.depth == second.depth));
+}
+
+void GameUtils::freeLibs(vector<pair<GetAlgoFuncType, HINSTANCE>>& playersVec)
+{
+	for (auto i = 0; i < playersVec.size(); i++)
+		FreeLibrary(playersVec[i].second);
+
 }
