@@ -76,8 +76,8 @@ public:
 	//loads algorithm from dll	
 	static pair<GetAlgoFuncType, HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName);
 
-	//Loads all players to vector
-	static vector<pair<GetAlgoFuncType, HINSTANCE>> GameUtils::loadPlayers(const string& path, list<string>& dllNames);
+	//loads all players to vector
+	static vector<tuple<GetAlgoFuncType, HINSTANCE, string>> GameUtils::loadPlayers(const string& path, list<string>& dllNames);
 
 	//Check if the board is valid
 	static int checkBoard(char3DArray& board, int rows, int cols, int depth, int* mistakes);
@@ -104,5 +104,5 @@ public:
 	
 	static bool coordinatesComparator(const Coordinate& first, const Coordinate& second);
 	//free dll's
-	static void GameUtils::freeLibs(vector<pair<GetAlgoFuncType, HINSTANCE>>& playersVec);
+	static void GameUtils::freeLibs(vector<tuple<GetAlgoFuncType, HINSTANCE,string>>& playersVec);
 };

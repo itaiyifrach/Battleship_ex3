@@ -52,24 +52,6 @@ char3DArray GameUtils::allocateBoard(int rows, int cols, int depth)
 	return board;
 }
 
-/*char3DArray GameUtils::copyBoard(char3DArray& from, int rows, int cols, int depth)
-{
-	char3DArray board = make_unique<unique_ptr<unique_ptr<char[]>[]>[]>(rows);
-	for (int i = 0; i < rows; i++)
-	{
-		board[i] = make_unique<unique_ptr<char[]>[]>(cols);
-		for (int j = 0; j < cols; j++)
-		{
-			board[i][j] = make_unique<char[]>(depth);
-			for (int k = 0; k < depth; k++)
-			{
-				board[i][j][k] =from[i][j][k];
-			}
-		}
-	}
-	return board;
-
-}*/
 
 int GameUtils::parsePath(const string& basePath,  vector<string>& boardNames)
 {
@@ -724,21 +706,6 @@ list<string> GameUtils::getDLLNames(string& path)
 
 }
 
-/*
-pair<IBattleshipGameAlgo*, HINSTANCE> GameUtils::loadAlgo (const string& path, const string& fileName)
-{
-	
-	// define function of the type we expect
-	typedef IBattleshipGameAlgo *(*GetAlgoFuncType)();
-	GetAlgoFuncType getAlgoFunc;
-	string algoPath = path + "\\" + fileName;
-	// Load dynamic library
-	HINSTANCE hDll = LoadLibraryA(algoPath.c_str()); // Notice: Unicode compatible version of LoadLibrary	
-	// Get function pointer
-	getAlgoFunc = reinterpret_cast<GetAlgoFuncType>(GetProcAddress(hDll,"GetAlgorithm"));		
-	return make_pair(getAlgoFunc(), hDll);
-
-}*/
 
 pair<GetAlgoFuncType,HINSTANCE> GameUtils::loadAlgo(const string& path, const string& fileName)
 {
@@ -763,10 +730,10 @@ pair<GetAlgoFuncType,HINSTANCE> GameUtils::loadAlgo(const string& path, const st
 
 }
 
-vector<pair<GetAlgoFuncType, HINSTANCE>> GameUtils::loadPlayers(const string& path, list<string>& dllNames)
+vector<tuple<GetAlgoFuncType, HINSTANCE,string>> GameUtils::loadPlayers(const string& path, list<string>& dllNames)
 {
 	BSLogger::loggerPrintInfo(LOADING_PLAYERS_START);
-	vector<pair<GetAlgoFuncType, HINSTANCE>> playersVec;
+	vector<tuple<GetAlgoFuncType, HINSTANCE,string>> playersVec;
 	//go over all the players and remove invalid players from the list
 	for (std::list<string>::const_iterator iterator = dllNames.begin(), end = dllNames.end(); iterator != end; ++iterator)
 	{
@@ -777,7 +744,7 @@ vector<pair<GetAlgoFuncType, HINSTANCE>> GameUtils::loadPlayers(const string& pa
 		}
 		else
 		{
-			playersVec.push_back(algo_pair);
+			playersVec.push_back(make_tuple(algo_pair.first,algo_pair.second,*iterator));
 		}
 	}
 
@@ -908,9 +875,9 @@ bool GameUtils::coordinatesComparator(const Coordinate& first, const Coordinate&
 	return ((first.row == second.row) && (first.col == second.col) && (first.depth == second.depth));
 }
 
-void GameUtils::freeLibs(vector<pair<GetAlgoFuncType, HINSTANCE>>& playersVec)
+void GameUtils::freeLibs(vector<tuple<GetAlgoFuncType, HINSTANCE,string>>& playersVec)
 {
 	for (auto i = 0; i < playersVec.size(); i++)
-		FreeLibrary(playersVec[i].second);
+		FreeLibrary(get<1>(playersVec[i]));
 
 }

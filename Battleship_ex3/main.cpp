@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 	auto c = playerA->attack();
 	*/
 	numOfGames = numOfPlayers*(numOfPlayers - 1)*numOfBoards;
-	CompetitionManager competition(boardVec, dllNames, playersVec, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
+	CompetitionManager competition(boardVec,  playersVec, basePath, numOfBoards, numOfPlayers, numOfGames, numOfThreads);
 	CompetitionManager::launcher(competition);
 	BSLogger::closeLogger();
 	GameUtils::freeLibs(playersVec);

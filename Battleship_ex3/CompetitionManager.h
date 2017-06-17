@@ -45,9 +45,9 @@ class CompetitionManager
 
 
 public:
-	CompetitionManager( vector<pair<char3DArray, int>>& boardVec, vector<string> playerNames,
-		vector<pair<GetAlgoFuncType, HINSTANCE>>& playersVec,string path, int numOfBoards,int numOfPlayers,int numOfGames, int numOfThreads) :
-		 boardVec(boardVec), playerNames(playerNames.begin(),playerNames.end()), playersVec(playersVec), path(path),
+	CompetitionManager( vector<pair<char3DArray, int>>& boardVec,	vector<tuple<GetAlgoFuncType, HINSTANCE,string>>& playersVec,
+		string path, int numOfBoards,int numOfPlayers,int numOfGames, int numOfThreads) :
+		 boardVec(boardVec), playersVec(playersVec), path(path),
 		 numOfBoards(numOfBoards),numOfPlayers(numOfPlayers) , numOfGames(numOfGames),numOfThreads(min(numOfThreads,numOfGames))
 	{
 		playersData = vector<vector<playerData>>(numOfPlayers);
@@ -57,8 +57,7 @@ public:
 
 private:
 	const vector<pair<char3DArray, int>> boardVec;
-	const vector<string> playerNames;
-	const vector<pair<GetAlgoFuncType, HINSTANCE>> playersVec;
+	const vector<tuple<GetAlgoFuncType, HINSTANCE,string>> playersVec;
 	const string path;
 	const int numOfBoards;
 	const int numOfPlayers;

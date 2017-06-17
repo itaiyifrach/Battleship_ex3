@@ -43,7 +43,7 @@ void CompetitionManager::printResults(CompetitionManager& competition, int maxLe
 		playerNum = results[i].first;
 		winsRatio = results[i].second.wins / double(results[i].second.gamesPlayed);
 
-		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(maxLengthName + 4) << competition.playerNames[playerNum]
+		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(maxLengthName + 4) << get<2>(competition.playersVec[playerNum])
 			<< setw(8) << results[i].second.wins << setw(8) << results[i].second.losses;
 		cout.copyfmt(oldState);
 		cout << left << setw(8) << setprecision(4) << winsRatio;
@@ -71,10 +71,10 @@ int CompetitionManager::findMinGames()
 int CompetitionManager::getMaxLengthName(CompetitionManager& competition)
 {
 	int maxLength = 0;
-	auto n = competition.playerNames.size();
+	auto n = competition.playersVec.size();
 
 	for (auto i = 0; i < n; i++) {
-		auto tempLength = competition.playerNames[i].length();
+		auto tempLength = (get<2>(competition.playersVec[i])).length();
 		if (maxLength <= tempLength)
 		{
 			maxLength = int(tempLength);
@@ -89,10 +89,8 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 	while (!finished)
 		{
 		tuple<int, int, int> currentGame;
-		string first = "getting game\n";
 		{
 			lock_guard<mutex> lock1(queueMutex);			
-			cout << first;
 			currentGame = gamesQueue.getGameParams();			
 		}
 
@@ -104,10 +102,10 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		auto boardIndex = get<0>(currentGame);
 		auto playerIndexA = get<1>(currentGame);
 		auto playerIndexB = get<2>(currentGame);
-		string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
-		cout << second;
+		//string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
+		//cout << second;
 		auto currBoard = competition.boardVec[boardIndex];
-		BattleshipGame game(currBoard, competition.playersVec[playerIndexA].first(), competition.playersVec[playerIndexB].first());
+		BattleshipGame game(currBoard, (get<0>(competition.playersVec[playerIndexA]))(), (get<0>(competition.playersVec[playerIndexB])()));
 		//tuple<int, int, int> gameResults = game.playGame();
 		{
 			lock_guard<mutex> lock2(dataMutex);			
@@ -118,11 +116,12 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		++currentNumOfGames;
 		result_printer.notify_one();		
 	}
+	/*
 	//print for debug purposes
 	{
 		lock_guard<mutex> lock1(debugMutex);		
 		cout << std::this_thread::get_id() << " this thread is done mate" << endl;
-	}	
+	}	*/
 
 
 }
@@ -162,12 +161,12 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	for (thread& t : threads)
 	{
 		t.join();
-		cout << "joined\n";
+		//cout << "joined\n";
 	}
 	//print final competition results (can be printed twice)
 	printResults(competition, maxLengthName);
 	//print for debug purposes
-	cout << "finished competition" << endl;
+	//cout << "finished competition" << endl;
 	BSLogger::loggerPrintInfo(EXITING_COMP + to_string(currentNumOfGames) + " games");
 }
 
