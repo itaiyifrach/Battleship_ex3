@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BattleshipGame.cpp" />
+    <ClCompile Include="BSLogger.cpp" />
     <ClCompile Include="CompetitionManager.cpp" />
     <ClCompile Include="GameUtils.cpp" />
     <ClCompile Include="main.cpp" />

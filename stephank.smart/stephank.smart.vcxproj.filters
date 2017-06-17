@@ -38,10 +38,10 @@
     <ClCompile Include="..\Battleship_ex3\OurBoardData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Battleship_ex3\BSLogger.cpp">
+    <ClCompile Include="..\Battleship_ex3\GameUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Battleship_ex3\GameUtils.cpp">
+    <ClCompile Include="..\Battleship_ex3\BSLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
