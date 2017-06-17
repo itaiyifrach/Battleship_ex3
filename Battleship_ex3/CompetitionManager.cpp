@@ -134,7 +134,12 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	int gap = max(1, competition.numOfGames / 10);
 	while (!finished ) 
 	{
-		if (result_printer.wait_for(lock1, std::chrono::seconds(3), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
+		if (result_printer.wait_for(lock1, std::chrono::seconds(3),
+			[gap,competition] {
+			if (currentNumOfGames == competition.numOfGames)
+				return true;
+			return (currentNumOfGames >= ourLastPrintNumOfGames + gap);			
+			}))
 		{
 			ourLastPrintNumOfGames = currentNumOfGames;
 			printResults(competition, maxLengthName);
