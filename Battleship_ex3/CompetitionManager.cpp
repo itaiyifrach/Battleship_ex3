@@ -105,11 +105,13 @@ void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerCom
 		//string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
 		//cout << second;
 		auto currBoard = competition.boardVec[boardIndex];
-		BattleshipGame game(currBoard, (get<0>(competition.playersVec[playerIndexA]))(), (get<0>(competition.playersVec[playerIndexB])()));
-		//tuple<int, int, int> gameResults = game.playGame();
+		unique_ptr<IBattleshipGameAlgo> playerA((get<0>(competition.playersVec[playerIndexA]))());
+		unique_ptr<IBattleshipGameAlgo> playerB((get<0>(competition.playersVec[playerIndexB]))());
+		BattleshipGame game(currBoard,playerA.get() ,playerB.get() );
+		tuple<int, int, int> gameResults = game.playGame();
 		{
 			lock_guard<mutex> lock2(dataMutex);			
-			updatePlayersData(playerIndexA, playerIndexB, 0, 22, 11);			
+			updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults),get<2>(gameResults));			
 		}
 		/*string third = "game results:\nthe winner is player number " + std::to_string(get<0>(gameResults))+" point for playerA: "+ std::to_string(get<1>(gameResults))+" points for playerB: "+ std::to_string(get<2>(gameResults))+"\n";
 		cout << third;*/
@@ -143,7 +145,8 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		threads.push_back(thread(threadWorker,std::ref(competition),std::ref(playerComb)));
 	}
 	//data registration loop
-	unique_lock<mutex> lock1(printerMutex);		
+	unique_lock<mutex> lock1(printerMutex);
+	//TODO-find a good gap and time
 	int gap = max(1, competition.numOfGames / PRINT_FREQ);
 	while (!finished && (currentNumOfGames != competition.numOfThreads)) 
 	{
@@ -154,9 +157,6 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		}
 		
 	}
-	//for debug
-	if (currentNumOfGames != competition.numOfGames)
-		cout << "Error: num of games played is: " << currentNumOfGames << " but should have played: " << competition.numOfGames << " games" << endl;
 
 	for (thread& t : threads)
 	{
