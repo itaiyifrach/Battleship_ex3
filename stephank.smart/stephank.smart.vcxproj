@@ -146,6 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Battleship_ex3\BattleshipPlayerSmart.h" />
+    <ClInclude Include="..\Battleship_ex3\BSLogger.h" />
+    <ClInclude Include="..\Battleship_ex3\GameUtils.h" />
+    <ClInclude Include="..\Battleship_ex3\IBattleshipGameAlgo.h" />
+    <ClInclude Include="..\Battleship_ex3\OurBoardData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Battleship_ex3\BattleshipPlayerSmart.cpp" />
+    <ClCompile Include="..\Battleship_ex3\BSLogger.cpp" />
+    <ClCompile Include="..\Battleship_ex3\GameUtils.cpp" />
+    <ClCompile Include="..\Battleship_ex3\OurBoardData.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -50,7 +50,6 @@ tuple<int,int,int> BattleshipGame::playGame() {
 		}
 
 		//Notify players on results
-		//TODO-is the change from i+1,j+1 to currAttack is fine?
 		PlayerA->notifyOnAttackResult(turnOf, currAttack, currAttackRes);
 		PlayerB->notifyOnAttackResult(turnOf, currAttack, currAttackRes);
 
@@ -73,7 +72,7 @@ tuple<int,int,int> BattleshipGame::playGame() {
 	}	// end of while
 
 	int winnerNumber = -1;
-	//TODO- return results instead of printing them
+
 	if ((numOfShipsA) && (!numOfShipsB))
 	{
 		winnerNumber = PLAYER_A_NUM;
@@ -89,10 +88,7 @@ tuple<int,int,int> BattleshipGame::playGame() {
 		return make_tuple(winnerNumber, 0, 0);
 	}
 	return make_tuple(winnerNumber, scoreA, scoreB);
-		
-	/*cout << POINTS_STR << endl;
-	cout << PLAYER_A_POINTS_STR << scoreA << endl;
-	cout << PLAYER_B_POINTS_STR << scoreB << endl;*/
+
 }
 
 void BattleshipGame::getNextAttack(int& turnOf, bool& endGame, Coordinate& currAttack) const

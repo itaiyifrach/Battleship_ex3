@@ -31,7 +31,7 @@ void CompetitionManager::printResults(CompetitionManager& competition, int maxLe
 	ios oldState(nullptr);
 	oldState.copyfmt(cout);
 	//------------title------------//	
-	cout << "# CYCLE: " << fixture << endl << endl;
+	cout << "# CYCLE: " << fixture << endl;
 	cout << left << setw(8) << "#" << setw(maxLengthName + 4) << "Team Name" << setw(8) << "Wins"
 		<< setw(8) << "Losses" << setw(8) << "%" << setw(8) << "Pts For" 
 		<< setw(12) << left << "Pts Against";
@@ -51,6 +51,7 @@ void CompetitionManager::printResults(CompetitionManager& competition, int maxLe
 		cout << left << setw(8) << results[i].second.pointsFor << setw(12) << results[i].second.pointsAgainst;
 		cout << endl;
 	}
+	cout << endl;
 	cout.copyfmt(oldState);
 
 }
@@ -86,44 +87,32 @@ int CompetitionManager::getMaxLengthName(CompetitionManager& competition)
 
 void CompetitionManager::threadWorker(CompetitionManager& competition, PlayerComb& gamesQueue)
 {
-	while (!finished)
-		{
-		tuple<int, int, int> currentGame;
-		{
-			lock_guard<mutex> lock1(queueMutex);			
-			currentGame = gamesQueue.getGameParams();			
-		}
 
-		 if (get<0>(currentGame) == -1)
+		while (!finished)
 		{
-			break;
+			tuple<int, int, int> currentGame;
+			{
+				lock_guard<mutex> lock1(queueMutex);
+				currentGame = gamesQueue.getGameParams();
+			}
+
+			if (get<0>(currentGame) == -1)
+			{
+				break;
+			}
+
+			auto boardIndex = get<0>(currentGame);
+			auto playerIndexA = get<1>(currentGame);
+			auto playerIndexB = get<2>(currentGame);
+			auto currBoard = competition.boardVec[boardIndex];
+			unique_ptr<IBattleshipGameAlgo> playerA(get<0>(competition.playersVec[playerIndexA])());
+			unique_ptr<IBattleshipGameAlgo> playerB(get<0>(competition.playersVec[playerIndexB])());
+			BattleshipGame game(currBoard, playerA.get(), playerB.get());
+			tuple<int, int, int> gameResults = game.playGame();
+			updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults), get<2>(gameResults));
+			++currentNumOfGames;
+			result_printer.notify_one();
 		}
-		
-		auto boardIndex = get<0>(currentGame);
-		auto playerIndexA = get<1>(currentGame);
-		auto playerIndexB = get<2>(currentGame);
-		//string second = "<" + std::to_string(boardIndex) + "," + std::to_string(playerIndexA) + "," + std::to_string(playerIndexB) + ">\n";
-		//cout << second;
-		auto currBoard = competition.boardVec[boardIndex];
-		unique_ptr<IBattleshipGameAlgo> playerA((get<0>(competition.playersVec[playerIndexA]))());
-		unique_ptr<IBattleshipGameAlgo> playerB((get<0>(competition.playersVec[playerIndexB]))());
-		BattleshipGame game(currBoard,playerA.get() ,playerB.get() );
-		tuple<int, int, int> gameResults = game.playGame();
-		{
-			lock_guard<mutex> lock2(dataMutex);			
-			updatePlayersData(playerIndexA, playerIndexB, get<0>(gameResults), get<1>(gameResults),get<2>(gameResults));			
-		}
-		/*string third = "game results:\nthe winner is player number " + std::to_string(get<0>(gameResults))+" point for playerA: "+ std::to_string(get<1>(gameResults))+" points for playerB: "+ std::to_string(get<2>(gameResults))+"\n";
-		cout << third;*/
-		++currentNumOfGames;
-		result_printer.notify_one();		
-	}
-	/*
-	//print for debug purposes
-	{
-		lock_guard<mutex> lock1(debugMutex);		
-		cout << std::this_thread::get_id() << " this thread is done mate" << endl;
-	}	*/
 
 
 }
@@ -132,10 +121,6 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 {
 	vector<thread> threads;
 	PlayerComb playerComb(competition.numOfPlayers, competition.numOfBoards);
-	//playerComb.printComb();
-
-	//print for debug purposes
-	cout << "launching competition" << endl;
 	BSLogger::loggerPrintInfo(LAUNCHING_COMP + to_string(competition.numOfPlayers) + " players and "
 								+ to_string(competition.numOfBoards) + " boards");
 
@@ -145,16 +130,14 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 		threads.push_back(thread(threadWorker,std::ref(competition),std::ref(playerComb)));
 	}
 	//data registration loop
-	unique_lock<mutex> lock1(printerMutex);
-	//TODO-find a good gap and time
+	unique_lock<mutex> lock1(printerMutex);		
 	int gap = max(1, competition.numOfGames / 10);
-	while (!finished) 
+	while (!finished ) 
 	{
-		if (result_printer.wait_for(lock1, std::chrono::seconds(1), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
+		if (result_printer.wait_for(lock1, std::chrono::seconds(3), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
 		{
 			ourLastPrintNumOfGames = currentNumOfGames;
 			printResults(competition, maxLengthName);
-			playerComb.printComb();
 		}
 		
 	}
@@ -162,27 +145,29 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	for (thread& t : threads)
 	{
 		t.join();
-		//cout << "joined\n";
 	}
 	//print final competition results (can be printed twice)
 	printResults(competition, maxLengthName);
-	//print for debug purposes
-	//cout << "finished competition" << endl;
 	BSLogger::loggerPrintInfo(EXITING_COMP + to_string(currentNumOfGames) + " games");
 }
 
 void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, int winnerNumber, int pointsForPlayerA, int pointsForPlayerB)
 {
 	playerData playerPrevDataA, playerPrevDataB;
-	int numOfGamesA = int(playersData[playerIndexA].size());
-	if (numOfGamesA != 0)
-		playerPrevDataA = playersData[playerIndexA][numOfGamesA-1];
+	{
+		lock_guard<mutex> lock1(dataMutex);
+		int numOfGamesA = int(playersData[playerIndexA].size());
+		if (numOfGamesA != 0)
+			playerPrevDataA = playersData[playerIndexA][numOfGamesA - 1];
+		int numOfGamesB = int(playersData[playerIndexB].size());
+		if (numOfGamesB != 0)
+			playerPrevDataB = playersData[playerIndexB][numOfGamesB - 1];
+	}
+
 	playerPrevDataA.pointsFor += pointsForPlayerA;
 	playerPrevDataA.pointsAgainst += pointsForPlayerB;
 	++playerPrevDataA.gamesPlayed;
-	int numOfGamesB= int(playersData[playerIndexB].size());
-	if (numOfGamesB != 0)
-		playerPrevDataB = playersData[playerIndexB][numOfGamesB - 1];
+
 	playerPrevDataB.pointsFor += pointsForPlayerB;
 	playerPrevDataB.pointsAgainst += pointsForPlayerA;
 	++playerPrevDataB.gamesPlayed;
@@ -200,8 +185,10 @@ void CompetitionManager::updatePlayersData(int playerIndexA, int playerIndexB, i
 	default:
 		break;
 	}
-	playersData[playerIndexA].push_back(playerPrevDataA);
-	playersData[playerIndexB].push_back(playerPrevDataB);
-	
+	{
+		lock_guard<mutex> lock1(dataMutex);
+		playersData[playerIndexA].push_back(playerPrevDataA);
+		playersData[playerIndexB].push_back(playerPrevDataB);
+	}
 
 }

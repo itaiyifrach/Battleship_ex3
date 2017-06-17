@@ -189,7 +189,6 @@ void BattleshipPlayerSmart::markSinkedShipAndUpdateAttacks(Coordinate att) {
 		if (colIndex > 1)
 		{
 			setMissAndRemoveCoordinate(Coordinate(att.row, colIndex - 1, att.depth));
-			
 		}
 		while ((colIndex <= myBoard.cols()) && (myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != 32) &&
 			(myBoard.charAt(Coordinate(att.row, colIndex, att.depth)) != '%'))
@@ -823,12 +822,13 @@ void BattleshipPlayerSmart::notifyOnOpponentsAttackResult(Coordinate att, Attack
 	}
 	else if ((result == AttackResult::Sink) && (myBoard.charAt(att) == 32))
 	{
-		myBoard.setHit(att);
 		if (GameUtils::coordinatesComparator(nextAttack,att))
 		{
 			searchForNextFirstHit(att , result);
+		} else {
+			myBoard.setHit(att);
+			markSinkedShipAndUpdateAttacks(att);
 		}
-		markSinkedShipAndUpdateAttacks(att);
 	}
 }
 

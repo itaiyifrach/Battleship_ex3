@@ -197,30 +197,21 @@ int GameUtils::checkBoard(char3DArray& board, int rows, int cols, int depth, int
 	for (int i = 0; i < depth; i++)
 	{
 		boardCut = getBoardCut(board, rows, cols, i, 2);
-		//print2DBoard(boardCut, rows, cols);
 		checkBoardCut(boardCut, rows, cols, mistakes, shipsTypeA, shipsTypeB);
-		//print1DBoard(shipsTypeA, 5);
-		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by COLS
 	for (int i = 0; i < cols; i++)
 	{
 		boardCut = getBoardCut(board, rows, depth, i, 1);
-		//print2DBoard(boardCut, rows, depth);
 		checkBoardCut(boardCut, rows, depth, mistakes, shipsTypeA, shipsTypeB);
-		//print1DBoard(shipsTypeA, 5);
-		//print1DBoard(shipsTypeB, 5);
 	}
 
 	// checking cuts by ROWS
 	for (int i = 0; i < rows; i++)
 	{
 		boardCut = getBoardCut(board, depth, cols, i, 0);
-		//print2DBoard(boardCut, depth, cols);
 		checkBoardCut(boardCut, depth, cols, mistakes, shipsTypeA, shipsTypeB);
-		//print1DBoard(shipsTypeA, 5);
-		//print1DBoard(shipsTypeB, 5);
 	}
 	// checking number of valid ships of players A and B:
 	if (shipsTypeA[0] != shipsTypeB[0]) {
@@ -329,7 +320,7 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			default:
 				continue;
 			}
-			//print2DBoard(markedBoard, rows, cols);
+			
 			if (validShape == true)
 			{
 				if (currPlayer == 0)
@@ -345,8 +336,6 @@ void GameUtils::checkBoardCut(char2DArray& board, int rows, int cols, int* mista
 			}
 		}
 	}	
-	//print2DBoard(markedBoard, rows, cols);
-	//finished scanning the board
 }
 
 bool GameUtils::checkSingleTile(char2DArray& board, int rows, int cols, int posI, int posJ)
@@ -651,8 +640,7 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 				numOfBoards++;				
 			}
 			else
-			{
-				cout << "Board #" << (j + 1) << " ERRORS:" << endl;
+			{				
 				BSLogger::loggerPrintError(boardNames[j] + " is invalid... ERRORS:");
 				for (int i = 0; i < 5; i++)
 				{
@@ -662,32 +650,26 @@ int GameUtils::getBoards(const string& path,vector<string>& boardNames, vector<p
 						{
 						case 0:
 							shipMistakeTypeA = mistakes[0];
-							cout << BOARD_MISTAKE_0 << shipMistakeTypeA << FOR_PLAYER << "A" << endl;
 							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeA) + FOR_PLAYER + 'A');
 							break;
 						case 1:
-							shipMistakeTypeB = mistakes[1];
-							cout << BOARD_MISTAKE_0 << shipMistakeTypeB << FOR_PLAYER << "B" << endl;
+							shipMistakeTypeB = mistakes[1];							
 							BSLogger::loggerPrintError(BOARD_MISTAKE_0 + string(1, shipMistakeTypeB) + FOR_PLAYER + 'B');
 							break;
-						case 2:
-							cout << BOARD_MISTAKE_2 << endl;
+						case 2:							
 							BSLogger::loggerPrintError(BOARD_MISTAKE_2);
 							break;
-						case 3:
-							cout << BOARD_MISTAKE_3 << endl;
+						case 3:							
 							BSLogger::loggerPrintError(BOARD_MISTAKE_3);
 							break;
-						case 4:
-							cout << BOARD_MISTAKE_4 << endl;
+						case 4:							
 							BSLogger::loggerPrintError(BOARD_MISTAKE_4);
 							break;
 						default:
 							break;
 						}
 					}
-				}
-				cout << endl;
+				}			
 			}	// end of else
 		}
 	}

@@ -123,7 +123,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BattleshipGame.h" />
-    <ClInclude Include="BattleshipPlayerSmart.h" />
     <ClInclude Include="BSLogger.h" />
     <ClInclude Include="CompetitionManager.h" />
     <ClInclude Include="GameUtils.h" />
@@ -133,8 +132,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BattleshipGame.cpp" />
-    <ClCompile Include="BattleshipPlayerSmart.cpp" />
-    <ClCompile Include="BSLogger.cpp" />
     <ClCompile Include="CompetitionManager.cpp" />
     <ClCompile Include="GameUtils.cpp" />
     <ClCompile Include="main.cpp" />
