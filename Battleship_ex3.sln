@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Battleship_ex3", "Battleship_ex3\Battleship_ex3.vcxproj", "{63591B17-EB46-46E8-89AF-67AF9424E050}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stephank.smart", "stephank.smart\stephank.smart.vcxproj", "{F914E320-A8FA-4C53-92EC-894A8EE24EAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{63591B17-EB46-46E8-89AF-67AF9424E050}.Release|x64.Build.0 = Release|x64
 		{63591B17-EB46-46E8-89AF-67AF9424E050}.Release|x86.ActiveCfg = Release|Win32
 		{63591B17-EB46-46E8-89AF-67AF9424E050}.Release|x86.Build.0 = Release|Win32
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Debug|x64.ActiveCfg = Debug|x64
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Debug|x64.Build.0 = Debug|x64
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Debug|x86.ActiveCfg = Debug|Win32
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Debug|x86.Build.0 = Debug|Win32
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Release|x64.ActiveCfg = Release|x64
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Release|x64.Build.0 = Release|x64
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Release|x86.ActiveCfg = Release|Win32
+		{F914E320-A8FA-4C53-92EC-894A8EE24EAB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
