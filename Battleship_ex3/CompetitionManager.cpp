@@ -46,7 +46,7 @@ void CompetitionManager::printResults(CompetitionManager& competition, int maxLe
 		cout << left << setw(8) << (to_string(i + 1) + '.') << setw(maxLengthName + 4) << get<2>(competition.playersVec[playerNum])
 			<< setw(8) << results[i].second.wins << setw(8) << results[i].second.losses;
 		cout.copyfmt(oldState);
-		cout << left << setw(8) << setprecision(4) << winsRatio;
+		cout << left << setw(8) << setprecision(2) << winsRatio;
 		cout.copyfmt(oldState);
 		cout << left << setw(8) << results[i].second.pointsFor << setw(12) << results[i].second.pointsAgainst;
 		cout << endl;
@@ -130,7 +130,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 {
 	vector<thread> threads;
 	PlayerComb playerComb(competition.numOfPlayers, competition.numOfBoards);
-	playerComb.printComb();
+	//playerComb.printComb();
 
 	//print for debug purposes
 	cout << "launching competition" << endl;
@@ -147,7 +147,7 @@ void CompetitionManager::launcher(CompetitionManager& competition)
 	int gap = max(1, competition.numOfGames / PRINT_FREQ);
 	while (!finished && (currentNumOfGames != competition.numOfThreads)) 
 	{
-		if (result_printer.wait_for(lock1, std::chrono::seconds(3), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
+		if (result_printer.wait_for(lock1, std::chrono::seconds(1), [gap] { return (currentNumOfGames >= ourLastPrintNumOfGames + gap); }))
 		{
 			ourLastPrintNumOfGames = currentNumOfGames;
 			printResults(competition, maxLengthName);
